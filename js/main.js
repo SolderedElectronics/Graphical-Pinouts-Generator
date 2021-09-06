@@ -1,0 +1,248 @@
+let canvas = new fabric.Canvas("c", {
+  preserveObjectStacking: true,
+});
+
+canvas.backgroundColor = "#fafafa";
+
+canvas.on("mouse:down", function (options) {
+  let groupItems;
+  if (options.target) {
+    let thisTarget = options.target;
+    let mousePos = canvas.getPointer(options.e);
+    let editTextbox = false;
+    let editObject;
+
+    if (thisTarget.isType("group")) {
+      let groupPos = {
+        x: thisTarget.left,
+        y: thisTarget.top,
+      };
+
+      thisTarget.forEachObject(function (object, i) {
+        if (object.type == "textbox") {
+          let matrix = thisTarget.calcTransformMatrix();
+          let newPoint = fabric.util.transformPoint(
+            { y: object.top, x: object.left },
+            matrix
+          );
+          let objectPos = {
+            xStart: newPoint.x - (object.width * object.scaleX) / 2, //When OriginX and OriginY are centered, otherwise xStart: newpoint.x - object.width * object.scaleX etc...
+            xEnd: newPoint.x + (object.width * object.scaleX) / 2,
+            yStart: newPoint.y - (object.height * object.scaleY) / 2,
+            yEnd: newPoint.y + (object.height * object.scaleY) / 2,
+          };
+
+          if (
+            mousePos.x >= objectPos.xStart &&
+            mousePos.x <= objectPos.xEnd &&
+            mousePos.y >= objectPos.yStart &&
+            mousePos.y <= objectPos.yEnd
+          ) {
+            function ungroup(group) {
+              groupItems = group._objects;
+              group._restoreObjectsState();
+              canvas.remove(group);
+              for (let i = 0; i < groupItems.length; i++) {
+                if (groupItems[i] != "textbox") {
+                  groupItems[i].selectable = false;
+                }
+                canvas.add(groupItems[i]);
+              }
+              canvas.renderAll();
+            }
+
+            ungroup(thisTarget);
+            canvas.setActiveObject(object);
+
+            object.enterEditing();
+            object.selectAll();
+
+            editObject = object;
+            let exitEditing = true;
+
+            editObject.on("editing:exited", function (options) {
+              if (exitEditing) {
+                let items = [];
+                groupItems.forEach(function (obj) {
+                  items.push(obj);
+                  canvas.remove(obj);
+                });
+
+                let grp;
+                grp = new fabric.Group(items, {});
+                canvas.add(grp);
+                exitEditing = false;
+              }
+            });
+          }
+        }
+      });
+    }
+  }
+});
+
+const wPerChar = 7;
+const padding = 20;
+
+class Selector {
+  constructor(l, t) {
+    this.g = new fabric.Group();
+
+    this.l = l;
+    this.t = t;
+
+    canvas.add(this.g);
+
+    this.leftRight = 0;
+  }
+
+  render(data) {
+    let widths = new Array(data[0].length).fill(0);
+    for (let i = 0; i < data.length; ++i) {
+      for (let j = 0; j < data[i].length; ++j) {
+        if (!data[i][j]) continue;
+        widths[j] = Math.max(widths[j], data[i][j].length * wPerChar);
+      }
+    }
+
+    let preWidths = [...widths];
+
+    for (let i = 0; i < widths.length; ++i) widths[i] += padding;
+    for (let i = 1; i < widths.length; ++i) widths[i] += widths[i - 1];
+
+    widths = [0, ...widths];
+
+    for (let i = 0; i < data.length; ++i) {
+      let k = 0;
+      for (let j = 0; j < data[i].length; ++j) if (data[i][j] != null) k = j;
+
+      let line = new fabric.Line(
+        [7, 10 + i * 20 + 6.7, 7 + widths[k + 1], 10 + i * 20 + 6.7],
+        {
+          fill: "black",
+          stroke: "black",
+          strokeWidth: 1,
+          selectable: false,
+          evented: false,
+        }
+      );
+      this.g.addWithUpdate(line);
+      line.moveTo(-2);
+
+      let c = new fabric.Circle({
+        left: 5,
+        top: 10 + i * 20 + 4,
+        fill: "purple",
+        stroke: "purple",
+        radius: 3,
+      });
+      this.g.addWithUpdate(c);
+
+      const getContrastYIQ = (hexcolor) => {
+        hexcolor = hexcolor.replace("#", "");
+        var r = parseInt(hexcolor.substr(0, 2), 16);
+        var g = parseInt(hexcolor.substr(2, 2), 16);
+        var b = parseInt(hexcolor.substr(4, 2), 16);
+        var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+        return yiq >= 128 ? "black" : "white";
+      };
+
+      for (let j = 0; j < data[i].length; ++j) {
+        if (data[i][j]) {
+          let w = preWidths[j] + 7;
+          let ph = new fabric.Path(
+            `M 0 0 L 7 7 L ${w} 7 L ${w + 7} 0 L ${w} -7 L 7 -7  z`,
+            {
+              stroke: "black",
+              strokeWidth: 1,
+              fill: document.getElementById("color" + j).value,
+              left: 15 + widths[j],
+              top: 10 + i * 20 + 6.5 - 7,
+            }
+          );
+          this.g.addWithUpdate(ph);
+          ph.moveTo(-1);
+
+          let txt = new fabric.Textbox(data[i][j], {
+            left: 22 + widths[j],
+            top: 10 + i * 20,
+            fill: getContrastYIQ(document.getElementById("color" + j).value),
+            width: 20,
+            fontSize: 12,
+            fontcolor: getContrastYIQ(
+              document.getElementById("color" + j).value
+            ),
+            fontFamily: "GT-Pressura",
+          });
+
+          this.g.input = document.getElementById("pins").value;
+          this.g.addWithUpdate(txt);
+        }
+      }
+    }
+
+    for (let x of this.g.getObjects()) x.dirty = true;
+
+    this.g.left = this.l;
+    this.g.top = this.t;
+
+    canvas.setActiveObject(this.g);
+    canvas.renderAll();
+  }
+}
+
+function renderOne(l, t) {
+  let s = new Selector(l, t);
+
+  try {
+    let t = document.getElementById("pins").value;
+
+    let v = JSON.parse(t);
+    s.render(v);
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+renderOne(0, 0);
+function refresh() {
+  if (!canvas.getActiveObject()) return;
+
+  let l = canvas.getActiveObject().left,
+    t = canvas.getActiveObject().top;
+
+  canvas.remove(canvas.getActiveObject());
+
+  renderOne(l, t);
+}
+
+function makeNew() {
+  renderOne();
+}
+
+/// =================================================================
+
+let imgCounter = 0;
+
+const imgFileHandler = (e) => {
+  var tgt = e.target,
+    files = tgt.files;
+
+  if (FileReader && files && files.length) {
+    var fr = new FileReader();
+    fr.onload = function () {
+      fabric.Image.fromURL(fr.result, function (myImg) {
+        var img1 = myImg;
+        img1.name =
+          "img" + imgCounter++ + "_" + files[0].name.replace(" ", "_");
+
+        canvas.moveTo(img1, -4);
+        img1.moveTo(-4);
+
+        // addToList(img1);
+        canvas.add(img1);
+      });
+    };
+    fr.readAsDataURL(files[0]);
+  }
+};
