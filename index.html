@@ -50,25 +50,27 @@
 ]</textarea>
     <button onclick="refresh()">Refresh Selected</button>
     <button onclick="makeNew()">Make New</button>
+    <button onclick="deleteObj()">Delete</button>
+    <button onclick="downloadCanvas()">Download image</button>
 
     <br>
     <input type="radio" id="right" name="side" value="right" checked>
     <label for="right">right</label>
     <br>
-    <input type="radio" id="left" name="side" value="left" checked>
+    <input type="radio" id="left" name="side" value="left">
     <label for="left">left</label>
 
     <br>
 
-    <input type="color" value="#008a42" id="color0" style="width: 40px;">
-    <input type="color" value="#9b468b" id="color1" style="width: 40px;">
-    <input type="color" value="#d8232a" id="color2" style="width: 40px;">
-    <input type="color" value="#191919" id="color3" style="width: 40px;">
-    <input type="color" value="#c6e7ee" id="color4" style="width: 40px;">
-    <input type="color" value="#89b84d" id="color5" style="width: 40px;">
-    <input type="color" value="#ffe414" id="color6" style="width: 40px;">
-    <input type="color" value="#f6fbf9" id="color7" style="width: 40px;">
-    <input type="color" value="#626363" id="color8" style="width: 40px;">
+    <input type="color" value="#008a42" id="color0" style="width: 40px;" onchange="updateColors()">
+    <input type="color" value="#9b468b" id="color1" style="width: 40px;" onchange="updateColors()">
+    <input type="color" value="#d8232a" id="color2" style="width: 40px;" onchange="updateColors()">
+    <input type="color" value="#191919" id="color3" style="width: 40px;" onchange="updateColors()">
+    <input type="color" value="#c6e7ee" id="color4" style="width: 40px;" onchange="updateColors()">
+    <input type="color" value="#89b84d" id="color5" style="width: 40px;" onchange="updateColors()">
+    <input type="color" value="#ffe414" id="color6" style="width: 40px;" onchange="updateColors()">
+    <input type="color" value="#f6fbf9" id="color7" style="width: 40px;" onchange="updateColors()">
+    <input type="color" value="#626363" id="color8" style="width: 40px;" onchange="updateColors()">
 
     <script src="js/fabric.js"></script>
     <script src="js/info.js"></script>

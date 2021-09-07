@@ -2,6 +2,21 @@ let canvas = new fabric.Canvas("c", {
   preserveObjectStacking: true,
 });
 
+document.getElementById("pins").value = JSON.stringify([
+  ["D4", null, null, null, null, null],
+  ["D5", null, null, null, null, null],
+  ["D4", null, null, null, null, null],
+  ["D4", null, null, null, null, null],
+  ["D4", null, null, null, null, null],
+  ["D4", null, null, null, null, null],
+  ["D4", null, null, null, null, null],
+  ["D4", null, null, null, null, null],
+  ["D4", null, null, "D12", null, null],
+  ["D4", null, null, null, null, null],
+  ["D4", null, null, null, null, null],
+  ["D4", "D8", "D4", "D4132312", "D8", "D4"],
+]);
+
 canvas.backgroundColor = "#fafafa";
 
 canvas.on("mouse:down", function (options) {
@@ -81,19 +96,49 @@ canvas.on("mouse:down", function (options) {
   }
 });
 
+canvas.on("text:editing:exited", function (e) {
+  const i = parseInt(e.target.idx.split(",")[0]);
+  const j = parseInt(e.target.idx.split(",")[1]);
+
+  let t = document.getElementById("pins").value;
+
+  try {
+    let v = JSON.parse(t);
+
+    v[i][j] = e.target.text;
+
+    document.getElementById("pins").value = JSON.stringify(v);
+
+    refresh(e.target.group);
+  } catch (e) {
+    console.log(e);
+  }
+});
+
 const wPerChar = 7;
 const padding = 20;
 
 class Selector {
-  constructor(l, t) {
+  constructor(l, t, lr, sx, sy, r) {
     this.g = new fabric.Group();
+    this.g.snapAngle = 15;
 
     this.l = l;
     this.t = t;
 
+    if (sx) this.sx = sx;
+    else this.sx = 1.0;
+
+    if (sy) this.sy = sy;
+    else this.sy = 1.0;
+
+    if (r) this.r = r;
+    else this.r = 0.0;
+
     canvas.add(this.g);
 
-    this.leftRight = 0;
+    this.leftRight = lr == null ? 0 : lr;
+    this.g.leftRight = lr == null ? 0 : lr;
   }
 
   render(data) {
@@ -117,7 +162,12 @@ class Selector {
       for (let j = 0; j < data[i].length; ++j) if (data[i][j] != null) k = j;
 
       let line = new fabric.Line(
-        [7, 10 + i * 20 + 6.7, 7 + widths[k + 1], 10 + i * 20 + 6.7],
+        [
+          7,
+          10 + i * 20 + 6.7,
+          7 + -(this.leftRight * 2 - 1) * widths[k + 1],
+          10 + i * 20 + 6.7,
+        ],
         {
           fill: "black",
           stroke: "black",
@@ -156,7 +206,10 @@ class Selector {
               stroke: "black",
               strokeWidth: 1,
               fill: document.getElementById("color" + j).value,
-              left: 15 + widths[j],
+              left:
+                (this.leftRight ? -w : 0) +
+                (this.leftRight ? -30 : 15) +
+                -(this.leftRight * 2 - 1) * widths[j],
               top: 10 + i * 20 + 6.5 - 7,
             }
           );
@@ -164,7 +217,10 @@ class Selector {
           ph.moveTo(-1);
 
           let txt = new fabric.Textbox(data[i][j], {
-            left: 22 + widths[j],
+            left:
+              (this.leftRight ? -w : 0) +
+              (this.leftRight ? -22 : 22) +
+              -(this.leftRight * 2 - 1) * widths[j],
             top: 10 + i * 20,
             fill: getContrastYIQ(document.getElementById("color" + j).value),
             width: 20,
@@ -174,6 +230,7 @@ class Selector {
             ),
             fontFamily: "GT-Pressura",
           });
+          txt.idx = i + ", " + j;
 
           this.g.input = document.getElementById("pins").value;
           this.g.addWithUpdate(txt);
@@ -185,14 +242,23 @@ class Selector {
 
     this.g.left = this.l;
     this.g.top = this.t;
+    this.g.scaleX = this.sx;
+    this.g.scaleY = this.sy;
+    this.g.angle = this.r;
 
     canvas.setActiveObject(this.g);
     canvas.renderAll();
   }
 }
 
-function renderOne(l, t) {
-  let s = new Selector(l, t);
+function updateColors() {
+  canvas.getObjects().map((o) => {
+    if (o.type == "group") refresh(o);
+  });
+}
+
+function renderOne(l, t, lr, sx, sy, r) {
+  let s = new Selector(l, t, lr, sx, sy, r);
 
   try {
     let t = document.getElementById("pins").value;
@@ -204,20 +270,46 @@ function renderOne(l, t) {
   }
 }
 
-renderOne(0, 0);
-function refresh() {
-  if (!canvas.getActiveObject()) return;
+function refresh(obj) {
+  if (!obj) obj = canvas.getActiveObject();
 
-  let l = canvas.getActiveObject().left,
-    t = canvas.getActiveObject().top;
+  if (!obj) return;
 
-  canvas.remove(canvas.getActiveObject());
+  let l = obj.left,
+    t = obj.top,
+    sx = obj.scaleX,
+    sy = obj.scaleY,
+    r = obj.angle;
 
-  renderOne(l, t);
+  canvas.remove(obj);
+
+  renderOne(l, t, document.getElementById("right").checked, sx, sy, r);
 }
 
 function makeNew() {
-  renderOne();
+  renderOne(0, 0, document.getElementById("right").checked);
+}
+
+function deleteObj() {
+  canvas.remove(canvas.getActiveObject());
+}
+
+window.onload = () => {
+  renderOne(0, 0, document.getElementById("right").checked);
+};
+
+function downloadURI(uri, name) {
+  var link = document.createElement("a");
+  link.download = name;
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  delete link;
+}
+
+function downloadCanvas(){
+  downloadURI(canvas.toDataURL({multiplier:4}), `outputPinout${new Date().toJSON().slice(0,10).replace(/-/g,'-')}.jpg`);
 }
 
 /// =================================================================
