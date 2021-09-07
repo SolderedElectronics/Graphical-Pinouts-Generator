@@ -20,7 +20,7 @@ document.getElementById("pins").value = JSON.stringify([
 canvas.backgroundColor = "#fafafa";
 
 canvas.on("mouse:down", function (options) {
-  let groupItems;
+  let groupItems, inp;
   if (options.target) {
     let thisTarget = options.target;
     let mousePos = canvas.getPointer(options.e);
@@ -56,6 +56,8 @@ canvas.on("mouse:down", function (options) {
             function ungroup(group) {
               groupItems = group._objects;
               group._restoreObjectsState();
+
+              inp = group.input;
               canvas.remove(group);
               for (let i = 0; i < groupItems.length; i++) {
                 if (groupItems[i] != "textbox") {
@@ -85,6 +87,7 @@ canvas.on("mouse:down", function (options) {
 
                 let grp;
                 grp = new fabric.Group(items, {});
+                grp.input = inp;
                 canvas.add(grp);
                 exitEditing = false;
               }
@@ -96,32 +99,34 @@ canvas.on("mouse:down", function (options) {
   }
 });
 
-function handleSelection(e) {
-  console.log(e.target);
-
-  document.getElementById("pins").value = e.target.input;
-
-  if (e.target.leftRight) document.getElementById("right").checked = true;
-  else document.getElementById("right").checked = false;
-}
-
 canvas.on("selection:created", function (e) {
-  document.getElementById("pins").value = e.target.input;
+  if (e.target.type == "group") {
+    document.getElementById("pins").value = e.target.input;
+
+    if (e.target.leftRight) document.getElementById("right").checked = true;
+    else document.getElementById("right").checked = false;
+  } else document.getElementById("pins").value = "";
 });
 canvas.on("selection:updated", function (e) {
-  document.getElementById("pins").value = e.target.input;
+  if (e.target.type == "group") {
+    document.getElementById("pins").value = e.target.input;
+
+    if (e.target.leftRight) document.getElementById("right").checked = true;
+    else document.getElementById("right").checked = false;
+  } else document.getElementById("pins").value = "";
 });
 
 const wPerChar = 7;
 const padding = 20;
 
 class Selector {
-  constructor(l, t, lr, sx, sy, r) {
+  constructor(l, t, lr, sx, sy, r, inp) {
     this.g = new fabric.Group();
     this.g.snapAngle = 15;
 
     this.l = l;
     this.t = t;
+    this.input = inp;
 
     if (sx) this.sx = sx;
     else this.sx = 1.0;
@@ -242,6 +247,7 @@ class Selector {
     this.g.scaleX = this.sx;
     this.g.scaleY = this.sy;
     this.g.angle = this.r;
+    if (this.input) this.g.input = this.input;
 
     canvas.setActiveObject(this.g);
     canvas.renderAll();
@@ -254,8 +260,9 @@ function updateColors() {
   });
 }
 
-function renderOne(l, t, lr, sx, sy, r) {
-  let s = new Selector(l, t, lr, sx, sy, r);
+function renderOne(l, t, lr, sx, sy, r, inp) {
+  console.log(inp);
+  let s = new Selector(l, t, lr, sx, sy, r, inp);
 
   try {
     let t = document.getElementById("pins").value;
@@ -276,11 +283,12 @@ function refresh(obj) {
     t = obj.top,
     sx = obj.scaleX,
     sy = obj.scaleY,
-    r = obj.angle;
+    r = obj.angle,
+    inp = obj.input;
 
   canvas.remove(obj);
 
-  renderOne(l, t, document.getElementById("right").checked, sx, sy, r);
+  renderOne(l, t, document.getElementById("right").checked, sx, sy, r, inp);
 }
 
 function makeNew() {
