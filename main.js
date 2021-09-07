@@ -100,6 +100,9 @@ canvas.on("mouse:down", function (options) {
 });
 
 canvas.on("selection:created", function (e) {
+  e.target.bringToFront();
+  canvas.bringToFront(e.target);
+
   if (e.target.type == "group") {
     document.getElementById("pins").value = e.target.input;
 
@@ -108,6 +111,9 @@ canvas.on("selection:created", function (e) {
   } else document.getElementById("pins").value = "";
 });
 canvas.on("selection:updated", function (e) {
+  e.target.bringToFront();
+  canvas.bringToFront(e.target);
+
   if (e.target.type == "group") {
     document.getElementById("pins").value = e.target.input;
 
@@ -296,10 +302,16 @@ function makeNew() {
 }
 
 function deleteObj() {
-  canvas.remove(canvas.getActiveObject());
+  var object = canvas.getActiveObject();
+  if (!object) {
+    alert("Please select the element to remove");
+    return "";
+  }
+  canvas.remove(object);
 }
 
 window.onload = () => {
+  document.getElementById("right").checked = "true";
   renderOne(0, 0, document.getElementById("right").checked);
 };
 
