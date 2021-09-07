@@ -267,7 +267,6 @@ function updateColors() {
 }
 
 function renderOne(l, t, lr, sx, sy, r, inp) {
-  console.log(inp);
   let s = new Selector(l, t, lr, sx, sy, r, inp);
 
   try {
