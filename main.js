@@ -19,6 +19,24 @@ document.getElementById("pins").value = JSON.stringify([
 
 canvas.backgroundColor = "#fafafa";
 
+canvas.on("text:editing:exited", function (e) {
+  // refresh(e.target.group);
+  // if (o.type == "group") refresh(o);
+
+  const [i, j] = e.target.idx.split(",").map((e) => parseInt(e));
+
+  try {
+    let a = JSON.parse(e.target.group.input);
+    a[i][j] = e.target.text;
+    e.target.group.input = JSON.stringify(a);
+  } catch (e) {
+    console.log(e);
+  }
+
+  canvas.setActiveObject(e.target.group);
+  setTimeout((v) => refresh(e.target.group), 10);
+});
+
 canvas.on("mouse:down", function (options) {
   let groupItems, inp;
   if (options.target) {
@@ -58,6 +76,7 @@ canvas.on("mouse:down", function (options) {
               group._restoreObjectsState();
 
               inp = group.input;
+              lr = group.leftRight;
               canvas.remove(group);
               for (let i = 0; i < groupItems.length; i++) {
                 if (groupItems[i] != "textbox") {
@@ -88,6 +107,7 @@ canvas.on("mouse:down", function (options) {
                 let grp;
                 grp = new fabric.Group(items, {});
                 grp.input = inp;
+                grp.leftRight = lr;
                 canvas.add(grp);
                 exitEditing = false;
               }
@@ -275,7 +295,7 @@ function renderOne(l, t, lr, sx, sy, r, inp) {
     let v = JSON.parse(t);
     s.render(v);
   } catch (e) {
-    console.log(e);
+    console.log("e");
   }
 }
 
