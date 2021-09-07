@@ -96,23 +96,20 @@ canvas.on("mouse:down", function (options) {
   }
 });
 
-canvas.on("text:editing:exited", function (e) {
-  const i = parseInt(e.target.idx.split(",")[0]);
-  const j = parseInt(e.target.idx.split(",")[1]);
+function handleSelection(e) {
+  console.log(e.target);
 
-  let t = document.getElementById("pins").value;
+  document.getElementById("pins").value = e.target.input;
 
-  try {
-    let v = JSON.parse(t);
+  if (e.target.leftRight) document.getElementById("right").checked = true;
+  else document.getElementById("right").checked = false;
+}
 
-    v[i][j] = e.target.text;
-
-    document.getElementById("pins").value = JSON.stringify(v);
-
-    refresh(e.target.group);
-  } catch (e) {
-    console.log(e);
-  }
+canvas.on("selection:created", function (e) {
+  document.getElementById("pins").value = e.target.input;
+});
+canvas.on("selection:updated", function (e) {
+  document.getElementById("pins").value = e.target.input;
 });
 
 const wPerChar = 7;
@@ -305,11 +302,13 @@ function downloadURI(uri, name) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  delete link;
 }
 
-function downloadCanvas(){
-  downloadURI(canvas.toDataURL({multiplier:4}), `outputPinout${new Date().toJSON().slice(0,10).replace(/-/g,'-')}.jpg`);
+function downloadCanvas() {
+  downloadURI(
+    canvas.toDataURL({ multiplier: 4 }),
+    `outputPinout${new Date().toJSON().slice(0, 10).replace(/-/g, "-")}.jpg`
+  );
 }
 
 /// =================================================================
