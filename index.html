@@ -2,81 +2,105 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphical Pinouts Generator</title>
 
-    <title>Graphical Pinout Generator</title>
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <style>
-        .selected {
-            background: lightgreen;
+        html,
+        body {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
         }
 
         @font-face {
             font-family: GT-Pressura;
             src: url('https://e-radionicacom.github.io/Graphical-Pinouts-Generator/GT-Pressura-Regular.ttf');
         }
-    </style>
 
+        .canvas-container {
+            margin: 0 auto;
+        }
+    </style>
 </head>
 
 <body>
 
-    <canvas width="1920" height="1080" id="c"></canvas>
+    <div style="height: 100%; width: 99%; margin: 0; padding: 0;">
+        <div class="row">
+            <div class="col-9">
+                <canvas width="1000" height="750" id="c"></canvas>
+            </div>
+            <div class="col-3">
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-primary" onclick="makeNew()">Make New</button>
+                    <button class="btn btn-danger" onclick="deleteObj()">Delete</button>
+                    <button class="btn btn-secondary" onclick="downloadCanvas()">Download image</button>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-around">
+                    <input class="btn btn-secondary" type="button" onclick="loadIconHandler()" value="Load Icon">
+                    <input class="btn btn-secondary" type="button" onclick="loadTextHandler()" value="Load Text">
+                </div>
+                <hr>
+                <textarea id="pins" rows="10" cols="50" style="width:100%;"></textarea>
+                <div class="d-flex flex-row justify-content-around">
+                    <button class="btn btn-secondary" onclick="refresh()">Refresh Selected</button>
+                    <div class="btn btn-secondary">
+                        <input type="radio" id="right" name="side" value="right" checked>
+                        <label for="right">right</label>
 
-    <label for="imageFile">Upload PCB Image</label>
-    <input name="imageFile" type="file" onchange="imgFileHandler(event)">
+                        <input type="radio" id="left" name="side" value="left">
+                        <label for="left">left</label>
+                    </div>
+                </div>
+                <hr>
+                <div class="d-flex flex-column justify-content-around" style="align-items: center;">
+                    <label for="imageFile">Upload PCB Image</label>
+                    <input name="imageFile" type="file" onchange="imgFileHandler(event)">
+                </div>
+                <hr>
+                <div class="d-flex flex-row justify-content-around">
+                    <input class="btn btn-secondary" type="button" onclick="lockImage()" value="Lock image">
+                </div>
+                <hr>
 
-    <div>
-        <ul id="items">
+                <div id="lockedImages" style="height:50px; display: flex;    overflow-x: auto;">
+                </div>
+                <hr>
 
-        </ul>
+                <div class="d-flex flex-row justify-content-around">
+                    <input type="color" value="#008a42" id="color0" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#9b468b" id="color1" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#d8232a" id="color2" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#191919" id="color3" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#c6e7ee" id="color4" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#89b84d" id="color5" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#ffe414" id="color6" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#f6fbf9" id="color7" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#626363" id="color8" style="width: 30px;" onchange="updateColors()">
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+    </div>
     </div>
 
-    <textarea id="pins" rows="10" cols="50">[
-    ["D4", null, null, null, null, null], 
-    ["D5", null, null, null, null, null],
-    ["D4", null, null, null, null, null],
-    ["D4", null, null, null, null, null],
-    ["D4", null, null, null, null, null],
-    ["D4", null, null, null, null, null],
-    ["D4", null, null, null, null, null],
-    ["D4", null, null, null, null, null],
-    ["D4", null, null, "D12", null, null],
-    ["D4", null, null, null, null, null],
-    ["D4", null, null, null, null, null],
-    ["D4", "D8", "D4", "D4132312", "D8", "D4"]
-]</textarea>
-    <button onclick="refresh()">Refresh Selected</button>
-    <button onclick="makeNew()">Make New</button>
-    <button onclick="deleteObj()">Delete</button>
-    <button onclick="downloadCanvas()">Download image</button>
-
-    <br>
-    <input type="radio" id="right" name="side" value="right" checked>
-    <label for="right">right</label>
-    <br>
-    <input type="radio" id="left" name="side" value="left">
-    <label for="left">left</label>
-
-    <br>
-
-    <input type="button" onclick="lockImage()" value="Lock image">
-    <br>
-    <div id="lockedImages"></div>
-    <br>
-
-    <input type="color" value="#008a42" id="color0" style="width: 40px;" onchange="updateColors()">
-    <input type="color" value="#9b468b" id="color1" style="width: 40px;" onchange="updateColors()">
-    <input type="color" value="#d8232a" id="color2" style="width: 40px;" onchange="updateColors()">
-    <input type="color" value="#191919" id="color3" style="width: 40px;" onchange="updateColors()">
-    <input type="color" value="#c6e7ee" id="color4" style="width: 40px;" onchange="updateColors()">
-    <input type="color" value="#89b84d" id="color5" style="width: 40px;" onchange="updateColors()">
-    <input type="color" value="#ffe414" id="color6" style="width: 40px;" onchange="updateColors()">
-    <input type="color" value="#f6fbf9" id="color7" style="width: 40px;" onchange="updateColors()">
-    <input type="color" value="#626363" id="color8" style="width: 40px;" onchange="updateColors()">
-
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
     <script src="fabric.js"></script>
     <script src="main.js"></script>
 </body>

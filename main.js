@@ -2,6 +2,11 @@ let canvas = new fabric.Canvas("c", {
   preserveObjectStacking: true,
 });
 
+function canvasResize() {
+  canvas.width = window.innerWidth * 0.75;
+  canvas.height = window.innerHeight;
+}
+
 function measureText(pText, pFontSize, pStyle) {
   var lDiv = document.createElement("div");
 
@@ -57,6 +62,8 @@ canvas.on("text:editing:exited", function (e) {
   // refresh(e.target.group);
   // if (o.type == "group") refresh(o);
 
+  if (!e.target.idx) return;
+
   const [i, j] = e.target.idx.split(",").map((e) => parseInt(e));
 
   try {
@@ -79,6 +86,9 @@ function lockImage() {
   let btn = document.createElement("button");
   btn.innerHTML = obj.name;
   btn.canvasElement = obj;
+
+  btn.style.flex = "1";
+  btn.style.marginRight = "10px";
 
   btn.onclick = (e) => {
     e.target.canvasElement.selectable = true;
@@ -428,6 +438,7 @@ function deleteObj() {
 }
 
 window.onload = () => {
+  canvasResize();
   document.getElementById("right").checked = "true";
   renderOne(0, 0, document.getElementById("right").checked);
 };
@@ -449,6 +460,31 @@ function downloadCanvas() {
 }
 
 /// =================================================================
+
+const loadIconHandler = (i) => {
+  fabric.Image.fromURL("/placeholder.png", function (myImg) {
+    //i create an extra var for to change some image properties
+    var img1 = myImg.set({ left: 100, top: 100 });
+
+    img1.scaleToHeight(50);
+    img1.scaleToWidth(50);
+
+    canvas.add(img1);
+  });
+};
+
+const loadTextHandler = () => {
+  var t = new fabric.Textbox("Texbox", {
+    top: 100,
+    left: 100,
+    fontSize: 12,
+    textAlign: "center",
+    fixedWidth: 150,
+    fontFamily: "GT-Pressura",
+  });
+
+  canvas.add(t);
+};
 
 let imgCounter = 0;
 
