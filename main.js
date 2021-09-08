@@ -2,12 +2,40 @@ let canvas = new fabric.Canvas("c", {
   preserveObjectStacking: true,
 });
 
+function measureText(pText, pFontSize, pStyle) {
+  var lDiv = document.createElement("div");
+
+  document.body.appendChild(lDiv);
+
+  if (pStyle != null) {
+    lDiv.style = pStyle;
+  }
+
+  lDiv.style.fontFamily = "GT-Pressura";
+  lDiv.style.fontSize = "" + pFontSize + "px";
+  lDiv.style.position = "absolute";
+  lDiv.style.left = -1000;
+  lDiv.style.top = -1000;
+
+  lDiv.innerHTML = pText;
+
+  var lResult = {
+    width: lDiv.clientWidth,
+    height: lDiv.clientHeight,
+  };
+
+  document.body.removeChild(lDiv);
+  lDiv = null;
+
+  return lResult;
+}
+
 document.getElementById("pins").value = JSON.stringify([
   ["D4", null, null, null, null, null],
   ["D5", null, null, null, null, null],
+  ["D4", null, null, null, "PWM", null],
   ["D4", null, null, null, null, null],
-  ["D4", null, null, null, null, null],
-  ["D4", null, null, null, null, null],
+  ["D4", null, null, null, "PWM", null],
   ["D4", null, null, null, null, null],
   ["D4", null, null, null, null, null],
   ["D4", null, null, null, null, null],
@@ -17,7 +45,13 @@ document.getElementById("pins").value = JSON.stringify([
   ["D4", "D8", "D4", "D4132312", "D8", "D4"],
 ]);
 
+let wa = 0;
+
 canvas.backgroundColor = "#fafafa";
+
+canvas.on("before:selection:cleared", function (e) {
+  if (!wa) document.getElementById("pins").value = "";
+});
 
 canvas.on("text:editing:exited", function (e) {
   // refresh(e.target.group);
@@ -34,11 +68,38 @@ canvas.on("text:editing:exited", function (e) {
   }
 
   canvas.setActiveObject(e.target.group);
-  setTimeout((v) => refresh(e.target.group), 10);
+  refresh(e.target.group);
 });
 
+function lockImage() {
+  let obj = canvas.getActiveObject();
+
+  if (!obj || obj.type != "image") return;
+
+  let btn = document.createElement("button");
+  btn.innerHTML = obj.name;
+  btn.canvasElement = obj;
+
+  btn.onclick = (e) => {
+    e.target.canvasElement.selectable = true;
+    e.target.canvasElement.evented = true;
+    canvas.setActiveObject(obj);
+
+    e.target.remove();
+  };
+
+  document.getElementById("lockedImages").appendChild(btn);
+
+  obj.selectable = false;
+  obj.evented = false;
+  canvas.sendToBack(obj);
+  obj.sendToBack();
+
+  canvas.discardActiveObject().renderAll();
+}
+
 canvas.on("mouse:down", function (options) {
-  let groupItems, inp;
+  let groupItems, inp, l, t, r;
   if (options.target) {
     let thisTarget = options.target;
     let mousePos = canvas.getPointer(options.e);
@@ -77,6 +138,10 @@ canvas.on("mouse:down", function (options) {
 
               inp = group.input;
               lr = group.leftRight;
+              l = group.left;
+              t = group.top;
+              r = group.angle;
+
               canvas.remove(group);
               for (let i = 0; i < groupItems.length; i++) {
                 if (groupItems[i] != "textbox") {
@@ -107,7 +172,16 @@ canvas.on("mouse:down", function (options) {
                 let grp;
                 grp = new fabric.Group(items, {});
                 grp.input = inp;
+
+                if (document.getElementById("pins").value)
+                  grp.input = document.getElementById("pins").value;
+
                 grp.leftRight = lr;
+
+                grp.left = l;
+                grp.top = t;
+                grp.angle = r;
+
                 canvas.add(grp);
                 exitEditing = false;
               }
@@ -171,10 +245,17 @@ class Selector {
 
   render(data) {
     let widths = new Array(data[0].length).fill(0);
+    let pwm = new Array(data[0].length).fill(0);
     for (let i = 0; i < data.length; ++i) {
       for (let j = 0; j < data[i].length; ++j) {
         if (!data[i][j]) continue;
-        widths[j] = Math.max(widths[j], data[i][j].length * wPerChar);
+
+        if (data[i][j].toUpperCase() === "PWM") {
+          pwm[i] = 1;
+        }
+
+        widths[j] = Math.max(widths[j], measureText(data[i][j], 12).width + 2);
+        // widths[j] = Math.max(widths[j], data[i][j].length * wPerChar);
       }
     }
 
@@ -189,9 +270,23 @@ class Selector {
       let k = 0;
       for (let j = 0; j < data[i].length; ++j) if (data[i][j] != null) k = j;
 
+      if (pwm[i]) {
+        let pwmP = new fabric.Path(
+          `M 0 0 L -6 0 L 2 0 Q 3.5 -9 5 0 T 8 0 T 11 0 L 20 0`,
+          {
+            stroke: "black",
+            strokeWidth: 1,
+            left: this.leftRight ? -18 : 8,
+            top: 10 + i * 20,
+            fill: "",
+          }
+        );
+        this.g.addWithUpdate(pwmP);
+      }
+
       let line = new fabric.Line(
         [
-          7,
+          10 + -(this.leftRight * 2 - 1) * (pwm[i] ? 20 : 0),
           10 + i * 20 + 6.7,
           7 + -(this.leftRight * 2 - 1) * widths[k + 1],
           10 + i * 20 + 6.7,
@@ -236,7 +331,7 @@ class Selector {
               fill: document.getElementById("color" + j).value,
               left:
                 (this.leftRight ? -w : 0) +
-                (this.leftRight ? -30 : 15) +
+                (this.leftRight ? -25 : 30) +
                 -(this.leftRight * 2 - 1) * widths[j],
               top: 10 + i * 20 + 6.5 - 7,
             }
@@ -247,7 +342,7 @@ class Selector {
           let txt = new fabric.Textbox(data[i][j], {
             left:
               (this.leftRight ? -w : 0) +
-              (this.leftRight ? -22 : 22) +
+              (this.leftRight ? -17 : 38) +
               -(this.leftRight * 2 - 1) * widths[j],
             top: 10 + i * 20,
             fill: getContrastYIQ(document.getElementById("color" + j).value),
@@ -295,14 +390,14 @@ function renderOne(l, t, lr, sx, sy, r, inp) {
     let v = JSON.parse(t);
     s.render(v);
   } catch (e) {
-    console.log("e");
+    console.log(e);
   }
 }
 
 function refresh(obj) {
   if (!obj) obj = canvas.getActiveObject();
 
-  if (!obj) return;
+  if (!obj || obj.type != "group") return;
 
   let l = obj.left,
     t = obj.top,
@@ -311,7 +406,12 @@ function refresh(obj) {
     r = obj.angle,
     inp = obj.input;
 
+  if (document.getElementById("pins").value)
+    inp = document.getElementById("pins").value;
+
+  wa = 1;
   canvas.remove(obj);
+  wa = 0;
 
   renderOne(l, t, document.getElementById("right").checked, sx, sy, r, inp);
 }
@@ -321,12 +421,10 @@ function makeNew() {
 }
 
 function deleteObj() {
-  var object = canvas.getActiveObject();
-  if (!object) {
-    alert("Please select the element to remove");
-    return "";
-  }
-  canvas.remove(object);
+  canvas.getActiveObjects().forEach((obj) => {
+    if (obj.type == "image") obj.visible = false; // https://github.com/fabricjs/fabric.js/issues/7359
+  });
+  // canvas.discardActiveObject().renderAll();
 }
 
 window.onload = () => {
@@ -365,6 +463,9 @@ const imgFileHandler = (e) => {
         var img1 = myImg;
         img1.name =
           "img" + imgCounter++ + "_" + files[0].name.replace(" ", "_");
+
+        img1.scaleToHeight(450);
+        img1.scaleToWidth(450);
 
         canvas.moveTo(img1, -4);
         img1.moveTo(-4);

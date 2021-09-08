@@ -23,7 +23,7 @@
 
 <body>
 
-    <canvas width="800" height="600" id="c"></canvas>
+    <canvas width="1920" height="1080" id="c"></canvas>
 
     <label for="imageFile">Upload PCB Image</label>
     <input name="imageFile" type="file" onchange="imgFileHandler(event)">
@@ -60,6 +60,11 @@
     <input type="radio" id="left" name="side" value="left">
     <label for="left">left</label>
 
+    <br>
+
+    <input type="button" onclick="lockImage()" value="Lock image">
+    <br>
+    <div id="lockedImages"></div>
     <br>
 
     <input type="color" value="#008a42" id="color0" style="width: 40px;" onchange="updateColors()">
