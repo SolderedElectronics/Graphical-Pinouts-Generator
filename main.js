@@ -252,6 +252,8 @@ canvas.on("selection:updated", function (e) {
   e.target.bringToFront();
   canvas.bringToFront(e.target);
 
+  if (e.target.ignore) return;
+
   if (e.target.type == "group") {
     document.getElementById("pins").value = e.target.input;
 
