@@ -508,6 +508,10 @@ function downloadCanvas() {
   );
 }
 
+canvas.on("after:render", function () {
+  canvas.calcOffset();
+});
+
 /// =================================================================
 
 const loadIconHandler = (i) => {
@@ -598,7 +602,7 @@ const imgFileHandler = (e) => {
 (function () {
   var doCheck = true;
   var check = function () {
-    canvasResize();
+    // canvasResize();
   };
   window.addEventListener("resize", function () {
     if (doCheck) {
