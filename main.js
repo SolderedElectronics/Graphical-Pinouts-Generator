@@ -535,10 +535,13 @@ const loadIconHandler = (i) => {
       var img1 = myImg.set({ left: 100, top: 100 });
 
       img1.ignore = true;
+      canvas.calcOffset();
+      canvas.renderAll();
 
       img1.scaleToHeight(50);
       img1.scaleToWidth(50);
 
+      canvas.add(img1);
       canvas.setActiveObject(img1);
     });
 };
