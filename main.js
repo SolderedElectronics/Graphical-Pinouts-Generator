@@ -36,34 +36,9 @@ function measureText(pText, pFontSize, pStyle) {
 }
 
 const defaultJson = [
-  [
-    "D4",
-    "3V3",
-    "GND",
-    "RST",
-    "GPIO8",
-    "A2",
-    "DAC1",
-    "SCK",
-    "TXD",
-    "SDA",
-    "AREF",
-    "PWM",
-  ],
-  [
-    "D4",
-    "3V3",
-    "GND",
-    "RST",
-    "GPIO8",
-    "A2",
-    "DAC1",
-    "SCK",
-    "TXD",
-    "SDA",
-    "AREF",
-    "PWM",
-  ],
+  ["D4", "", "", "", "", "", "", "", "", "", "", ""],
+  ["D4", "", "", "", "", "", "", "", "", "", "", ""],
+  ["D4", "", "", "", "", "", "", "", "", "", "", ""],
   [
     "D4",
     "3V3",
@@ -175,6 +150,7 @@ canvas.on("mouse:down", function (options) {
             mousePos.y <= objectPos.yEnd
           ) {
             function ungroup(group) {
+              pause_saving = true;
               groupItems = group._objects;
               group._restoreObjectsState();
 
@@ -226,6 +202,8 @@ canvas.on("mouse:down", function (options) {
 
                 canvas.add(grp);
                 exitEditing = false;
+
+                pause_saving = false;
               }
             });
           }
@@ -245,7 +223,7 @@ canvas.on("selection:created", function (e) {
     document.getElementById("pins").value = e.target.input;
 
     if (e.target.leftRight) document.getElementById("right").checked = true;
-    else document.getElementById("right").checked = false;
+    else document.getElementById("left").checked = true;
   } else document.getElementById("pins").value = "";
 });
 canvas.on("selection:updated", function (e) {
@@ -258,7 +236,7 @@ canvas.on("selection:updated", function (e) {
     document.getElementById("pins").value = e.target.input;
 
     if (e.target.leftRight) document.getElementById("right").checked = true;
-    else document.getElementById("right").checked = false;
+    else document.getElementById("left").checked = true;
   } else document.getElementById("pins").value = "";
 });
 
@@ -266,13 +244,14 @@ const wPerChar = 7;
 const padding = 20;
 
 class Selector {
-  constructor(l, t, lr, sx, sy, r, inp) {
+  constructor(l, t, lr, sx, sy, r, inp, id) {
     this.g = new fabric.Group();
     this.g.snapAngle = 15;
 
     this.l = l;
     this.t = t;
     this.input = inp;
+    this.id = id;
 
     if (sx) this.sx = sx;
     else this.sx = 1.0;
@@ -314,7 +293,7 @@ class Selector {
 
     for (let i = 0; i < data.length; ++i) {
       let k = 0;
-      for (let j = 0; j < data[i].length; ++j) if (data[i][j] != null) k = j;
+      for (let j = 0; j < data[i].length; ++j) if (data[i][j]) k = j;
 
       if (pwm[i]) {
         let pwmP = new fabric.Path(
@@ -415,6 +394,7 @@ class Selector {
     this.g.scaleY = this.sy;
     this.g.angle = this.r;
     if (this.input) this.g.input = this.input;
+    if (this.id) this.g.id = this.id;
 
     canvas.setActiveObject(this.g);
     canvas.renderAll();
@@ -427,16 +407,31 @@ function updateColors() {
   });
 }
 
-function renderOne(l, t, lr, sx, sy, r, inp) {
+function renderOne(l, t, lr, sx, sy, r, inp, fallback) {
   let s = new Selector(l, t, lr, sx, sy, r, inp);
 
   try {
     let t = document.getElementById("pins").value;
 
     let v = JSON.parse(t);
-    s.render(v);
+
+    if (v.every((item) => item.length == v[0].length)) {
+      s.render(v);
+    } else {
+      if (confirm("Not all row lengths are same, render default pinout?")) {
+        s.render(defaultJson);
+        document.getElementById("pins").value = JSON.stringify(defaultJson);
+      } else if (fallback) {
+        s.render(JSON.parse(fallback.input));
+      }
+    }
   } catch (e) {
-    s.render(defaultJson);
+    if (confirm("JSON data is faulty, render default pinout?")) {
+      s.render(defaultJson);
+      document.getElementById("pins").value = JSON.stringify(defaultJson);
+    } else if (fallback) {
+      s.render(JSON.parse(fallback.input));
+    }
   }
 }
 
@@ -459,7 +454,16 @@ function refresh(obj) {
   canvas.remove(obj);
   wa = 0;
 
-  renderOne(l, t, document.getElementById("right").checked, sx, sy, r, inp);
+  renderOne(
+    l,
+    t,
+    document.getElementById("right").checked,
+    sx,
+    sy,
+    r,
+    inp,
+    obj
+  );
 }
 
 function makeNew() {
@@ -478,8 +482,14 @@ function deleteObj() {
 
 window.onload = () => {
   canvasResize();
-  document.getElementById("right").checked = "true";
-  renderOne(250, 250, document.getElementById("right").checked);
+
+  document.getElementById("right").checked = "false";
+  document.getElementById("left").checked = "true";
+
+  renderOne(200, 250, true);
+  renderOne(200, 350, false);
+
+  undo_stack.push(JSON.stringify(canvas));
 };
 
 function downloadURI(uri, name) {
@@ -511,8 +521,6 @@ const loadIconHandler = (i) => {
     "assets/062-easyC-Front.png",
     "assets/button.svg",
   ];
-
-  console.log(urls[i], i);
 
   if (urls[i].endsWith(".svg")) {
     fabric.loadSVGFromURL(urls[i], function (objects, options) {
@@ -603,3 +611,103 @@ const imgFileHandler = (e) => {
     }
   });
 })();
+
+//variables for undo/redo
+let pause_saving = false;
+let undo_stack = [];
+let redo_stack = [];
+
+canvas.on("object:added", function (event) {
+  if (!pause_saving) {
+    undo_stack.push(
+      JSON.stringify(canvas.toObject(["id", "l", "r", "input", "t", "idx"]))
+    );
+    redo_stack = [];
+    // console.log("Object added, state saved", undo_stack);
+  }
+});
+canvas.on("object:modified", function (event) {
+  if (!pause_saving) {
+    undo_stack.push(
+      JSON.stringify(canvas.toObject(["id", "l", "r", "input", "t", "idx"]))
+    );
+    redo_stack = [];
+    // console.log("Object modified, state saved", undo_stack);
+  }
+});
+canvas.on("object:removed", function (event) {
+  if (!pause_saving) {
+    undo_stack.push(
+      JSON.stringify(canvas.toObject(["id", "l", "r", "input", "t", "idx"]))
+    );
+    redo_stack = [];
+    // console.log("Object removed, state saved", undo_stack);
+  }
+});
+
+const undo = () => {
+  pause_saving = true;
+  redo_stack.push(undo_stack.pop());
+  let previous_state = undo_stack[undo_stack.length - 1];
+  if (previous_state == null) {
+    previous_state = "{}";
+  }
+  canvas.loadFromJSON(
+    previous_state,
+    function () {
+      canvas.getObjects().forEach((o) => {
+        if (o.id && lastPos[o.id]) {
+          console.log("aa");
+
+          o.left = lastPos[o.id].x;
+          o.top = lastPos[o.id].y;
+        }
+      });
+      canvas.renderAll();
+    },
+    function (jsonObject, fabricObject) {
+      // jsonObject is the object as represented in the canvasJson
+      // fabricObject is the object that fabric created from this jsonObject
+
+      // ["id", "l", "r", "input", "t", "idx"]
+
+      console.log("a", jsonObject.idx);
+      if (jsonObject.id) fabricObject.id = jsonObject.id;
+      if (jsonObject.l) fabricObject.l = jsonObject.l;
+      if (jsonObject.t) fabricObject.t = jsonObject.t;
+      if (jsonObject.r) fabricObject.r = jsonObject.r;
+      if (jsonObject.input) fabricObject.input = jsonObject.input;
+      if (jsonObject.idx) fabricObject.idx = jsonObject.idx;
+    }
+  );
+  pause_saving = false;
+};
+
+const redo = () => {
+  pause_saving = true;
+  state = redo_stack.pop();
+  if (state != null) {
+    undo_stack.push(state);
+    canvas.loadFromJSON(state, function () {
+      canvas.renderAll();
+    });
+    pause_saving = false;
+  }
+};
+
+//Listen for undo/redo
+window.addEventListener("keydown", function (e) {
+  let repeat = e.repeat,
+    metaKey = e.metaKey,
+    key = e.key,
+    shiftKey = e.shiftKey,
+    ctrlKey = e.ctrlKey;
+
+  //Undo - CTRL+Z
+  if (repeat) return;
+  if ((metaKey || ctrlKey) && !shiftKey && key === "z") {
+    undo();
+  } else if ((metaKey || ctrlKey) && shiftKey && key === "z") {
+    redo();
+  }
+});

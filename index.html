@@ -26,6 +26,11 @@
         .canvas-container {
             margin: 0 auto;
         }
+
+        hr {
+            margin-left: 0;
+            margin-right: 0;
+        }
     </style>
 </head>
 
@@ -39,91 +44,138 @@
         <div class="row">
             <div class="col-9">
                 <canvas width="1000" height="750" id="c"></canvas>
+                <footer class="d-flex justify-content-around">
+                    <span>
+                        Made by
+                        <a href="https://www.soldered.com/" target="_blank">soldered.com</a>
+                    </span>
+
+                    <span>
+                        Work in progress, please
+                        <a href="https://github.com/e-radionicacom/Graphical-Pinouts-Generator/issues"
+                            target="_blank">report</a>
+                        all issues.
+                    </span>
+
+                    <span>
+                        Open Source Software:
+                        <a href="https://github.com/e-radionicacom/Inkplate-GUI-Designer" target="_blank">GitHub
+                            Repo</a>
+                    </span>
+                </footer>
             </div>
             <div class="col-3">
-                <hr>
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-primary" onclick="makeNew()"
-                        style="background-color: #7025BA;border-color: #7025BA;">Make
-                        New</button>
-                    <button class="btn btn-danger" onclick="deleteObj()"
-                        style="background-color: #25BAA8;border-color: #25BAA8;">Delete</button>
-                    <button style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
-                        onclick="downloadCanvas()">Download image</button>
-                </div>
-                <hr>
-                <div class="d-flex justify-content-around">
-                    <div class="dropdown show">
-                        <a style="background-color: #25BAA8;border-color: #25BAA8;"
-                            class="btn btn-secondary dropdown-toggle" role="button" id="dropdownMenuLink"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Common Icons
-                        </a>
+                <div style="flex: 1;display: flex;overflow: auto; flex-direction: column;">
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" onclick="makeNew()"
+                            style="background-color: #7025BA;border-color: #7025BA;">Make
+                            New</button>
+                        <button class="btn btn-danger" onclick="deleteObj()"
+                            style="background-color: #25BAA8;border-color: #25BAA8;">Delete</button>
+                        <button style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
+                            onclick="downloadCanvas()">Download image</button>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column justify-content-around" style="align-items: center;">
+                        <label for="imageFile">Add objects</label>
+                    </div>
+                    <div class="d-flex justify-content-around">
 
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                            <a class="dropdown-item" href="#" onclick="loadIconHandler(0)">Info</a>
-                            <a class="dropdown-item" href="#" onclick="loadIconHandler(1)">Attention Box</a>
-                            <a class="dropdown-item" href="#" onclick="loadIconHandler(2)">LED</a>
-                            <a class="dropdown-item" href="#" onclick="loadIconHandler(3)">Hand Symbol</a>
-                            <a class="dropdown-item" href="#" onclick="loadIconHandler(4)">USB</a>
-                            <a class="dropdown-item" href="#" onclick="loadIconHandler(5)">JST</a>
-                            <a class="dropdown-item" href="#" onclick="loadIconHandler(6)">easyC</a>
-                            <a class="dropdown-item" href="#" onclick="loadIconHandler(7)">Button</a>
+                        <div class="dropdown show">
+                            <a style="background-color: #25BAA8;border-color: #25BAA8;"
+                                class="btn btn-secondary dropdown-toggle" role="button" id="dropdownMenuLink"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Icons
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="#" onclick="loadIconHandler(0)">Info</a>
+                                <a class="dropdown-item" href="#" onclick="loadIconHandler(1)">Attention Box</a>
+                                <a class="dropdown-item" href="#" onclick="loadIconHandler(2)">LED</a>
+                                <a class="dropdown-item" href="#" onclick="loadIconHandler(3)">Hand Symbol</a>
+                                <a class="dropdown-item" href="#" onclick="loadIconHandler(4)">USB</a>
+                                <a class="dropdown-item" href="#" onclick="loadIconHandler(5)">Battery</a>
+                                <a class="dropdown-item" href="#" onclick="loadIconHandler(6)">easyC</a>
+                                <a class="dropdown-item" href="#" onclick="loadIconHandler(7)">Button</a>
+                            </div>
+                        </div>
+
+                        <div class="dropdown show">
+                            <a style="background-color: #25BAA8;border-color: #25BAA8;"
+                                class="btn btn-secondary dropdown-toggle" role="button" id="dropdownMenuLink"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Templates
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="#" onclick="">Unbranded</a>
+                                <a class="dropdown-item" href="#" onclick="">Soldered</a>
+                                <a class="dropdown-item" href="#" onclick="">Blank</a>
+                            </div>
+                        </div>
+
+                        <!-- <input class="btn btn-secondary" type="button" onclick="loadIconHandler()" value="Load Icon"> -->
+                        <input style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
+                            type="button" onclick="loadTextHandler()" value="Add Text">
+                    </div>
+                    <hr>
+
+                    <div class="d-flex flex-column justify-content-around" style="align-items: center;">
+                        <label for="imageFile">Upload PCB Image</label>
+                        <input name="imageFile" type="file" onchange="imgFileHandler(event)">
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-row justify-content-around">
+                        <input style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
+                            type="button" onclick="lockImage()" value="Lock image">
+                        <div>
+                            Locked images:<br>
+                            Click to unlock
                         </div>
                     </div>
-                    <!-- <input class="btn btn-secondary" type="button" onclick="loadIconHandler()" value="Load Icon"> -->
-                    <input style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
-                        type="button" onclick="loadTextHandler()" value="Load Text">
-                </div>
-                <hr>
-                <textarea id="pins" rows="10" cols="50" style="width:100%;"></textarea>
-                <div class="d-flex flex-row justify-content-around">
-                    <button style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
-                        onclick="refresh()">Refresh Selected</button>
-                    <div class="btn btn-secondary" style="background-color: #25BAA8;border-color: #25BAA8;">
-                        <input type="radio" id="right" name="side" value="right" checked>
-                        <label for="right" style="padding-top: 3px;">right</label>
+                    <br>
 
-                        <input type="radio" id="left" name="side" value="left">
-                        <label for="left">left</label>
+                    <div id="lockedImages" style="height:50px; display: flex;    overflow-x: auto;">
                     </div>
-                </div>
-                <hr>
-                <div class="d-flex flex-column justify-content-around" style="align-items: center;">
-                    <label for="imageFile">Upload PCB Image</label>
-                    <input name="imageFile" type="file" onchange="imgFileHandler(event)">
-                </div>
-                <hr>
-                <div class="d-flex flex-row justify-content-around">
-                    <input style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
-                        type="button" onclick="lockImage()" value="Lock image">
-                    <div>
-                        Locked images:<br>
-                        Click to unlock
+                    <hr>
+                    <div class="d-flex flex-column justify-content-around" style="align-items: center;">
+                        <label for="imageFile">Pinout labels</label>
                     </div>
-                </div>
-                <br>
+                    <textarea id="pins" rows="10" cols="50" style="width:100%;"></textarea>
 
-                <div id="lockedImages" style="height:50px; display: flex;    overflow-x: auto;">
-                </div>
-                <hr>
+                    <div class="d-flex flex-row justify-content-around">
+                        <button style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
+                            onclick="refresh()">Refresh Selected</button>
+                        <div class="btn btn-secondary" style="background-color: #25BAA8;border-color: #25BAA8;">
+                            <input type="radio" id="right" name="side" value="right" checked>
+                            <label for="right" style="padding-top: 3px;">right</label>
 
-                <div class="d-flex flex-row justify-content-around">
-                    <input type="color" value="#cccccc" id="color0" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#ff0000" id="color1" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#000000" id="color2" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#ffff00" id="color3" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#93c47d" id="color4" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#3c78d8" id="color5" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#a4c2f4" id="color6" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#e69138" id="color7" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#6e281b" id="color8" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#ab4f7f" id="color9" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#331f74" id="color10" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#245a0c" id="color11" style="width: 30px;" onchange="updateColors()">
+                            <input type="radio" id="left" name="side" value="left">
+                            <label for="left">left</label>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex flex-column justify-content-around" style="align-items: center;">
+                        <label for="imageFile">Label colors</label>
+                    </div>
+                    <div class="d-flex flex-row justify-content-around">
+                        <input type="color" value="#cccccc" id="color0" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#ff0000" id="color1" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#000000" id="color2" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#ffff00" id="color3" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#93c47d" id="color4" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#3c78d8" id="color5" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#a4c2f4" id="color6" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#e69138" id="color7" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#6e281b" id="color8" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#ab4f7f" id="color9" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#331f74" id="color10" style="width: 30px;" onchange="updateColors()">
+                        <input type="color" value="#245a0c" id="color11" style="width: 30px;" onchange="updateColors()">
+                    </div>
+                    <hr>
                 </div>
             </div>
-            <hr>
         </div>
     </div>
     </div>
