@@ -481,7 +481,7 @@ function deleteObj() {
 }
 
 window.onload = () => {
-  canvasResize();
+  // canvasResize();
 
   document.getElementById("right").checked = "false";
   document.getElementById("left").checked = "true";

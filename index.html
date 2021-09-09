@@ -16,6 +16,7 @@
             padding: 0px;
             height: 100%;
             font-family: GT-Pressura;
+            zoom: 90%;
         }
 
         @font-face {
@@ -41,9 +42,9 @@
             style="position: absolute; z-index: 2; margin-top: 10px; margin-left: 10px; color: #7025BA; font-family: GT-Pressura;">
             <h3>Soldered Graphic Pinout Designer</h3>
         </div>
-        <div class="row">
-            <div class="col-9">
-                <canvas width="1000" height="750" id="c"></canvas>
+        <div class="row justify-content-around" style="flex: 1;align-items: center">
+            <div>
+                <canvas width="1050" height="750" id="c"></canvas>
                 <footer class="d-flex justify-content-around">
                     <span>
                         Made by
@@ -64,8 +65,8 @@
                     </span>
                 </footer>
             </div>
-            <div class="col-3">
-                <div style="flex: 1;display: flex;overflow: auto; flex-direction: column;">
+            <div>
+                <div style="width: 300px; flex: 1;display: flex;overflow: scroll; flex-direction: column;">
                     <hr>
                     <div class="d-flex justify-content-between">
                         <button class="btn btn-primary" onclick="makeNew()"
