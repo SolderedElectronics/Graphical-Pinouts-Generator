@@ -469,7 +469,7 @@ function deleteObj() {
   canvas.getActiveObjects().forEach((obj) => {
     if (obj.type == "image") obj.visible = false;
     // https://github.com/fabricjs/fabric.js/issues/7359
-    else canvas.remove(obj); // https://github.com/fabricjs/fabric.js/issues/7359
+    else canvas.remove(obj);
   });
   canvas.discardActiveObject().renderAll();
 }
@@ -501,13 +501,13 @@ function downloadCanvas() {
 const loadIconHandler = (i) => {
   const urls = [
     "assets/information.svg",
-    "/assets/warning.svg",
-    "/assets/led.svg",
-    "/assets/select.svg",
-    "/assets/010-usb.png",
-    "/assets/043-low-battery.png",
-    "/assets/062-easyC-Front.png",
-    "/assets/button.svg",
+    "assets/warning.svg",
+    "assets/led.svg",
+    "assets/select.svg",
+    "assets/010-usb.png",
+    "assets/043-low-battery.png",
+    "assets/062-easyC-Front.png",
+    "assets/button.svg",
   ];
 
   console.log(urls[i], i);
