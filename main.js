@@ -500,7 +500,7 @@ function downloadCanvas() {
 
 const loadIconHandler = (i) => {
   const urls = [
-    "/assets/information.svg",
+    "assets/information.svg",
     "/assets/warning.svg",
     "/assets/led.svg",
     "/assets/select.svg",
