@@ -15,6 +15,7 @@
             margin: 0px;
             padding: 0px;
             height: 100%;
+            font-family: GT-Pressura;
         }
 
         @font-face {
@@ -31,6 +32,10 @@
 <body>
 
     <div style="height: 100%; width: 99%; margin: 0; padding: 0;">
+        <div
+            style="position: absolute; z-index: 2; margin-top: 10px; margin-left: 10px; color: #7025BA; font-family: GT-Pressura;">
+            <h3>Soldered Graphic Pinout Designer</h3>
+        </div>
         <div class="row">
             <div class="col-9">
                 <canvas width="1000" height="750" id="c"></canvas>
@@ -38,22 +43,46 @@
             <div class="col-3">
                 <hr>
                 <div class="d-flex justify-content-between">
-                    <button class="btn btn-primary" onclick="makeNew()">Make New</button>
-                    <button class="btn btn-danger" onclick="deleteObj()">Delete</button>
-                    <button class="btn btn-secondary" onclick="downloadCanvas()">Download image</button>
+                    <button class="btn btn-primary" onclick="makeNew()"
+                        style="background-color: #7025BA;border-color: #7025BA;">Make
+                        New</button>
+                    <button class="btn btn-danger" onclick="deleteObj()"
+                        style="background-color: #25BAA8;border-color: #25BAA8;">Delete</button>
+                    <button style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
+                        onclick="downloadCanvas()">Download image</button>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-around">
-                    <input class="btn btn-secondary" type="button" onclick="loadIconHandler()" value="Load Icon">
-                    <input class="btn btn-secondary" type="button" onclick="loadTextHandler()" value="Load Text">
+                    <div class="dropdown show">
+                        <a style="background-color: #25BAA8;border-color: #25BAA8;"
+                            class="btn btn-secondary dropdown-toggle" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Common Icons
+                        </a>
+
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <a class="dropdown-item" href="#" onclick="loadIconHandler(0)">Info</a>
+                            <a class="dropdown-item" href="#" onclick="loadIconHandler(1)">Attention Box</a>
+                            <a class="dropdown-item" href="#" onclick="loadIconHandler(2)">LED</a>
+                            <a class="dropdown-item" href="#" onclick="loadIconHandler(3)">Hand Symbol</a>
+                            <a class="dropdown-item" href="#" onclick="loadIconHandler(4)">USB</a>
+                            <a class="dropdown-item" href="#" onclick="loadIconHandler(5)">JST</a>
+                            <a class="dropdown-item" href="#" onclick="loadIconHandler(6)">easyC</a>
+                            <a class="dropdown-item" href="#" onclick="loadIconHandler(7)">Button</a>
+                        </div>
+                    </div>
+                    <!-- <input class="btn btn-secondary" type="button" onclick="loadIconHandler()" value="Load Icon"> -->
+                    <input style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
+                        type="button" onclick="loadTextHandler()" value="Load Text">
                 </div>
                 <hr>
                 <textarea id="pins" rows="10" cols="50" style="width:100%;"></textarea>
                 <div class="d-flex flex-row justify-content-around">
-                    <button class="btn btn-secondary" onclick="refresh()">Refresh Selected</button>
-                    <div class="btn btn-secondary">
+                    <button style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
+                        onclick="refresh()">Refresh Selected</button>
+                    <div class="btn btn-secondary" style="background-color: #25BAA8;border-color: #25BAA8;">
                         <input type="radio" id="right" name="side" value="right" checked>
-                        <label for="right">right</label>
+                        <label for="right" style="padding-top: 3px;">right</label>
 
                         <input type="radio" id="left" name="side" value="left">
                         <label for="left">left</label>
@@ -66,24 +95,32 @@
                 </div>
                 <hr>
                 <div class="d-flex flex-row justify-content-around">
-                    <input class="btn btn-secondary" type="button" onclick="lockImage()" value="Lock image">
+                    <input style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
+                        type="button" onclick="lockImage()" value="Lock image">
+                    <div>
+                        Locked images:<br>
+                        Click to unlock
+                    </div>
                 </div>
-                <hr>
+                <br>
 
                 <div id="lockedImages" style="height:50px; display: flex;    overflow-x: auto;">
                 </div>
                 <hr>
 
                 <div class="d-flex flex-row justify-content-around">
-                    <input type="color" value="#008a42" id="color0" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#9b468b" id="color1" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#d8232a" id="color2" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#191919" id="color3" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#c6e7ee" id="color4" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#89b84d" id="color5" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#ffe414" id="color6" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#f6fbf9" id="color7" style="width: 30px;" onchange="updateColors()">
-                    <input type="color" value="#626363" id="color8" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#cccccc" id="color0" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#ff0000" id="color1" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#000000" id="color2" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#ffff00" id="color3" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#93c47d" id="color4" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#3c78d8" id="color5" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#a4c2f4" id="color6" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#e69138" id="color7" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#6e281b" id="color8" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#ab4f7f" id="color9" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#331f74" id="color10" style="width: 30px;" onchange="updateColors()">
+                    <input type="color" value="#245a0c" id="color11" style="width: 30px;" onchange="updateColors()">
                 </div>
             </div>
             <hr>

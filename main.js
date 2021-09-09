@@ -35,27 +35,59 @@ function measureText(pText, pFontSize, pStyle) {
   return lResult;
 }
 
-document.getElementById("pins").value = JSON.stringify([
-  ["D4", null, null, null, null, null],
-  ["D5", null, null, null, null, null],
-  ["D4", null, null, null, "PWM", null],
-  ["D4", null, null, null, null, null],
-  ["D4", null, null, null, "PWM", null],
-  ["D4", null, null, null, null, null],
-  ["D4", null, null, null, null, null],
-  ["D4", null, null, null, null, null],
-  ["D4", null, null, "D12", null, null],
-  ["D4", null, null, null, null, null],
-  ["D4", null, null, null, null, null],
-  ["D4", "D8", "D4", "D4132312", "D8", "D4"],
-]);
+const defaultJson = [
+  [
+    "D4",
+    "3V3",
+    "GND",
+    "RST",
+    "GPIO8",
+    "A2",
+    "DAC1",
+    "SCK",
+    "TXD",
+    "SDA",
+    "AREF",
+    "PWM",
+  ],
+  [
+    "D4",
+    "3V3",
+    "GND",
+    "RST",
+    "GPIO8",
+    "A2",
+    "DAC1",
+    "SCK",
+    "TXD",
+    "SDA",
+    "AREF",
+    "PWM",
+  ],
+  [
+    "D4",
+    "3V3",
+    "GND",
+    "RST",
+    "GPIO8",
+    "A2",
+    "DAC1",
+    "SCK",
+    "TXD",
+    "SDA",
+    "AREF",
+    "PWM",
+  ],
+];
+
+document.getElementById("pins").value = JSON.stringify(defaultJson, null, 2);
 
 let wa = 0;
 
 canvas.backgroundColor = "#fafafa";
 
 canvas.on("before:selection:cleared", function (e) {
-  if (!wa) document.getElementById("pins").value = "";
+  if (!wa && !e.target.ignore) document.getElementById("pins").value = "";
 });
 
 canvas.on("text:editing:exited", function (e) {
@@ -206,6 +238,8 @@ canvas.on("mouse:down", function (options) {
 canvas.on("selection:created", function (e) {
   e.target.bringToFront();
   canvas.bringToFront(e.target);
+
+  if (e.target.ignore) return;
 
   if (e.target.type == "group") {
     document.getElementById("pins").value = e.target.input;
@@ -400,7 +434,7 @@ function renderOne(l, t, lr, sx, sy, r, inp) {
     let v = JSON.parse(t);
     s.render(v);
   } catch (e) {
-    console.log(e);
+    s.render(defaultJson);
   }
 }
 
@@ -427,20 +461,23 @@ function refresh(obj) {
 }
 
 function makeNew() {
-  renderOne(0, 0, document.getElementById("right").checked);
+  document.getElementById("right").checked = "true";
+  renderOne(250, 250, document.getElementById("right").checked);
 }
 
 function deleteObj() {
   canvas.getActiveObjects().forEach((obj) => {
-    if (obj.type == "image") obj.visible = false; // https://github.com/fabricjs/fabric.js/issues/7359
+    if (obj.type == "image") obj.visible = false;
+    // https://github.com/fabricjs/fabric.js/issues/7359
+    else canvas.remove(obj); // https://github.com/fabricjs/fabric.js/issues/7359
   });
-  // canvas.discardActiveObject().renderAll();
+  canvas.discardActiveObject().renderAll();
 }
 
 window.onload = () => {
   canvasResize();
   document.getElementById("right").checked = "true";
-  renderOne(0, 0, document.getElementById("right").checked);
+  renderOne(250, 250, document.getElementById("right").checked);
 };
 
 function downloadURI(uri, name) {
@@ -462,19 +499,50 @@ function downloadCanvas() {
 /// =================================================================
 
 const loadIconHandler = (i) => {
-  fabric.Image.fromURL("/placeholder.png", function (myImg) {
-    //i create an extra var for to change some image properties
-    var img1 = myImg.set({ left: 100, top: 100 });
+  const urls = [
+    "/assets/information.svg",
+    "/assets/warning.svg",
+    "/assets/led.svg",
+    "/assets/select.svg",
+    "/assets/010-usb.png",
+    "/assets/043-low-battery.png",
+    "/assets/062-easyC-Front.png",
+    "/assets/button.svg",
+  ];
 
-    img1.scaleToHeight(50);
-    img1.scaleToWidth(50);
+  console.log(urls[i], i);
 
-    canvas.add(img1);
-  });
+  if (urls[i].endsWith(".svg")) {
+    fabric.loadSVGFromURL(urls[i], function (objects, options) {
+      var g = fabric.util.groupSVGElements(objects, options);
+      canvas.add(g);
+      g.set({ left: 100, top: 100 });
+
+      g.scaleToHeight(50);
+      g.scaleToWidth(50);
+
+      g.ignore = true;
+      canvas.calcOffset();
+      canvas.renderAll();
+
+      canvas.setActiveObject(g);
+    });
+  } else
+    fabric.Image.fromURL(urls[i], function (myImg) {
+      //i create an extra var for to change some image properties
+      var img1 = myImg.set({ left: 100, top: 100 });
+
+      img1.ignore = true;
+
+      img1.scaleToHeight(50);
+      img1.scaleToWidth(50);
+
+      canvas.setActiveObject(img1);
+    });
 };
 
 const loadTextHandler = () => {
-  var t = new fabric.Textbox("Texbox", {
+  var t = new fabric.Textbox("Textbox", {
     top: 100,
     left: 100,
     fontSize: 12,
@@ -513,3 +581,20 @@ const imgFileHandler = (e) => {
     fr.readAsDataURL(files[0]);
   }
 };
+
+(function () {
+  var doCheck = true;
+  var check = function () {
+    canvasResize();
+  };
+  window.addEventListener("resize", function () {
+    if (doCheck) {
+      check();
+      doCheck = false;
+      setTimeout(function () {
+        doCheck = true;
+        check();
+      }, 500);
+    }
+  });
+})();
