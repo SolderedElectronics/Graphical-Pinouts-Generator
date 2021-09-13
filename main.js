@@ -379,6 +379,7 @@ class Selector {
             fontFamily: "GT-Pressura",
           });
           txt.idx = i + ", " + j;
+          txt.bg = ph;
 
           this.g.input = document.getElementById("pins").value;
           this.g.addWithUpdate(txt);
@@ -403,8 +404,17 @@ class Selector {
 
 function updateColors() {
   canvas.getObjects().map((o) => {
-    if (o.type == "group") refresh(o);
+    if (o.type == "group") {
+      o.getObjects().forEach((o2) => {
+        if (o2.idx) {
+          const [i, j] = o2.idx.split(",").map((e) => parseInt(e));
+          o2.bg.fill = document.getElementById("color" + j).value;
+          o2.bg.set("dirty", true);
+        }
+      });
+    }
   });
+  canvas.renderAll();
 }
 
 function renderOne(l, t, lr, sx, sy, r, inp, fallback) {
@@ -626,7 +636,9 @@ let redo_stack = [];
 canvas.on("object:added", function (event) {
   if (!pause_saving) {
     undo_stack.push(
-      JSON.stringify(canvas.toObject(["id", "l", "r", "input", "t", "idx"]))
+      JSON.stringify(
+        canvas.toObject(["id", "l", "r", "input", "t", "idx", "bg"])
+      )
     );
     redo_stack = [];
     // console.log("Object added, state saved", undo_stack);
@@ -635,7 +647,9 @@ canvas.on("object:added", function (event) {
 canvas.on("object:modified", function (event) {
   if (!pause_saving) {
     undo_stack.push(
-      JSON.stringify(canvas.toObject(["id", "l", "r", "input", "t", "idx"]))
+      JSON.stringify(
+        canvas.toObject(["id", "l", "r", "input", "t", "idx", "bg"])
+      )
     );
     redo_stack = [];
     // console.log("Object modified, state saved", undo_stack);
@@ -644,7 +658,9 @@ canvas.on("object:modified", function (event) {
 canvas.on("object:removed", function (event) {
   if (!pause_saving) {
     undo_stack.push(
-      JSON.stringify(canvas.toObject(["id", "l", "r", "input", "t", "idx"]))
+      JSON.stringify(
+        canvas.toObject(["id", "l", "r", "input", "t", "idx", "bg"])
+      )
     );
     redo_stack = [];
     // console.log("Object removed, state saved", undo_stack);
@@ -677,13 +693,13 @@ const undo = () => {
 
       // ["id", "l", "r", "input", "t", "idx"]
 
-      console.log("a", jsonObject.idx);
       if (jsonObject.id) fabricObject.id = jsonObject.id;
       if (jsonObject.l) fabricObject.l = jsonObject.l;
       if (jsonObject.t) fabricObject.t = jsonObject.t;
       if (jsonObject.r) fabricObject.r = jsonObject.r;
       if (jsonObject.input) fabricObject.input = jsonObject.input;
       if (jsonObject.idx) fabricObject.idx = jsonObject.idx;
+      if (jsonObject.bg) fabricObject.bg = jsonObject.bg;
     }
   );
   pause_saving = false;
