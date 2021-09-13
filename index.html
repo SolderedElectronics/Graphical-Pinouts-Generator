@@ -108,6 +108,7 @@
                                 <a class="dropdown-item" href="#" onclick="loadIconHandler(5)">Battery</a>
                                 <a class="dropdown-item" href="#" onclick="loadIconHandler(6)">easyC</a>
                                 <a class="dropdown-item" href="#" onclick="loadIconHandler(7)">Button</a>
+                                <a class="dropdown-item" href="#" onclick="loadIconHandler(8)">Open Source Hardware</a>
                             </div>
                         </div>
 
@@ -125,9 +126,18 @@
                             </div>
                         </div>
 
-                        <!-- <input class="btn btn-secondary" type="button" onclick="loadIconHandler()" value="Load Icon"> -->
-                        <input style="background-color: #25BAA8;border-color: #25BAA8;" class="btn btn-secondary"
-                            type="button" onclick="loadTextHandler()" value="Add Text">
+                        <div class="dropdown show">
+                            <a style="background-color: #25BAA8;border-color: #25BAA8;"
+                                class="btn btn-secondary dropdown-toggle" role="button" id="dropdownMenuLink"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Add Text
+                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="#" onclick="loadTextHandler(0)">Black</a>
+                                <a class="dropdown-item" href="#" onclick="loadTextHandler(1)">Purple</a>
+                            </div>
+                        </div>
                     </div>
                     <hr>
 

@@ -59,7 +59,7 @@ document.getElementById("pins").value = JSON.stringify(defaultJson, null, 2);
 
 let wa = 0;
 
-canvas.backgroundColor = "#fafafa";
+canvas.backgroundColor = "#f1f0f0";
 
 canvas.on("before:selection:cleared", function (e) {
   if (!wa && !e.target.ignore) document.getElementById("pins").value = "";
@@ -524,6 +524,7 @@ const loadIconHandler = (i) => {
     "assets/043-low-battery.png",
     "assets/062-easyC-Front.png",
     "assets/button.svg",
+    "assets/063-OSH.png",
   ];
 
   if (urls[i].endsWith(".svg")) {
@@ -558,7 +559,7 @@ const loadIconHandler = (i) => {
     });
 };
 
-const loadTextHandler = () => {
+const loadTextHandler = (i) => {
   var t = new fabric.Textbox("Textbox", {
     top: 100,
     left: 100,
@@ -566,6 +567,7 @@ const loadTextHandler = () => {
     textAlign: "center",
     fixedWidth: 150,
     fontFamily: "GT-Pressura",
+    fill: ["black", "#7025BA"][i],
   });
 
   canvas.add(t);
