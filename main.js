@@ -93,6 +93,8 @@ function lockImage(obj) {
   if (!obj) return;
   // if (!obj || obj.type != "image") return;
 
+  if (obj.type == "textbox" && obj.bg) return;
+
   let btn = document.createElement("button");
   btn.innerHTML = obj.name || obj.type;
   btn.canvasElement = obj;
@@ -101,6 +103,7 @@ function lockImage(obj) {
   btn.style.marginRight = "10px";
 
   btn.onclick = (e) => {
+    console.log("ckicker");
     e.target.canvasElement.selectable = true;
     e.target.canvasElement.evented = true;
     canvas.setActiveObject(obj);
@@ -116,6 +119,8 @@ function lockImage(obj) {
   // obj.sendToBack();
 
   canvas.discardActiveObject().renderAll();
+
+  return btn;
 }
 
 canvas.on("mouse:down", function (options) {
@@ -563,6 +568,8 @@ function downloadCanvas() {
     };
   }
 
+  // lock texta
+
   console.log(options);
   downloadURI(
     canvas.toDataURL(options),
@@ -585,6 +592,7 @@ canvas.on("after:render", function () {
 /// =================================================================
 
 let template = null;
+let template_button = null;
 
 const loadTemplateHandler = (i) => {
   const urls = [
@@ -592,7 +600,10 @@ const loadTemplateHandler = (i) => {
     "assets/Soldered-template.jpg",
   ];
 
-  if (template) canvas.remove(template);
+  if (template) {
+    template_button.click();
+    canvas.remove(template);
+  }
 
   fabric.Image.fromURL(urls[i], function (myImg) {
     //i create an extra var for to change some image properties
@@ -617,7 +628,7 @@ const loadTemplateHandler = (i) => {
     canvas.setActiveObject(img1);
 
     img1.name = "Template";
-    lockImage(img1);
+    template_button = lockImage(img1);
 
     canvas.calcOffset();
     canvas.renderAll();
