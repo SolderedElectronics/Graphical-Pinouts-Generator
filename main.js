@@ -261,6 +261,8 @@ canvas.on("selection:updated", function (e) {
 const wPerChar = 7;
 const padding = 20;
 
+const alignTo = true;
+
 class Selector {
   constructor(l, t, lr, sx, sy, r, inp, id) {
     this.g = new fabric.Group();
@@ -285,13 +287,13 @@ class Selector {
     this.leftRight = lr == null ? 0 : lr;
     this.g.leftRight = lr == null ? 0 : lr;
   }
-
+  // delete dodat
   render(data) {
     let widths = new Array(data[0].length).fill(0);
     let pwm = new Array(data[0].length).fill(0);
     for (let i = 0; i < data.length; ++i) {
       for (let j = 0; j < data[i].length; ++j) {
-        if (!data[i][j]) continue;
+        if (!data[i][j] && !document.getElementById("align").checked) continue;
 
         if (data[i][j].toUpperCase() === "PWM") {
           pwm[i] = 1;
@@ -331,7 +333,9 @@ class Selector {
         [
           10 + -(this.leftRight * 2 - 1) * (pwm[i] ? 20 : 0),
           10 + i * 20 + 6.7,
-          7 + -(this.leftRight * 2 - 1) * widths[k + 1],
+          7 +
+            -(this.leftRight * 2 - 1) *
+              (!document.getElementById("align").checked ? widths[k + 1] : 25),
           10 + i * 20 + 6.7,
         ],
         {
@@ -363,11 +367,18 @@ class Selector {
         return yiq >= 128 ? "black" : "white";
       };
 
+      let wt = 0;
       for (let j = 0; j < data[i].length; ++j) {
         if (data[i][j]) {
           let w = preWidths[j] + 7;
           let ph = new fabric.Path(
-            `M 0 0 L 7 7 L ${w} 7 L ${w + 7} 0 L ${w} -7 L 7 -7  z`,
+            this.leftRight
+              ? `M 0 0 L 7 7 L ${w} 7 L ${w + 7} 0 L ${w} -7 L 7 -7 L 0 0 M ${
+                  w + 7
+                } 0 L ${w + 14} 0 z`
+              : `M 0 0 L -7 0 M 0 0 L 7 7 L ${w} 7 L ${
+                  w + 7
+                } 0 L ${w} -7 L 7 -7  z`,
             {
               stroke: "black",
               strokeWidth: 1,
@@ -375,18 +386,23 @@ class Selector {
               left:
                 (this.leftRight ? -w : 0) +
                 (this.leftRight ? -25 : 30) +
-                -(this.leftRight * 2 - 1) * widths[j],
+                (document.getElementById("align").checked
+                  ? -(this.leftRight * 2 - 1) * wt
+                  : -(this.leftRight * 2 - 1) * widths[j]),
               top: 10 + i * 20 + 6.5 - 7,
             }
           );
+
           this.g.addWithUpdate(ph);
           ph.moveTo(-1);
 
           let txt = new fabric.Textbox(data[i][j], {
             left:
               (this.leftRight ? -w : 0) +
-              (this.leftRight ? -17 : 38) +
-              -(this.leftRight * 2 - 1) * widths[j],
+              (this.leftRight ? -17 : 44) +
+              (document.getElementById("align").checked
+                ? -(this.leftRight * 2 - 1) * wt
+                : -(this.leftRight * 2 - 1) * widths[j]),
             top: 10 + i * 20,
             fill: getContrastYIQ(document.getElementById("color" + j).value),
             width: 20,
@@ -401,6 +417,8 @@ class Selector {
 
           this.g.input = document.getElementById("pins").value;
           this.g.addWithUpdate(txt);
+
+          wt += w + 13;
         }
       }
     }
@@ -442,6 +460,15 @@ function renderOne(l, t, lr, sx, sy, r, inp, fallback) {
     let t = document.getElementById("pins").value;
 
     let v = JSON.parse(t);
+
+    let mx = 0;
+    v.forEach((r) => {
+      mx = Math.max(mx, r.length);
+    });
+
+    for (let i = 0; i < v.length; ++i) {
+      v[i].push(...new Array(mx - v[i].length).fill(""));
+    }
 
     if (v.every((item) => item.length == v[0].length)) {
       s.render(v);
@@ -599,12 +626,10 @@ canvas.on("after:render", function () {
 let template = null;
 let template_button = null;
 
-// boju teksta ne mijenja
-
 const loadTemplateHandler = (i) => {
   const urls = [
-    "assets/Unbranded-template.jpg",
-    "assets/Soldered-template.jpg",
+    "assets/Unbranded-template.png",
+    "assets/Soldered-template.png",
   ];
 
   if (template) {
@@ -851,6 +876,10 @@ const imgFileHandler = (e) => {
 //     redo();
 //   }
 // });
+
+window.addEventListener("keydown", function (e) {
+  if (e.key == 46 || e.key == 8) deleteObj();
+});
 
 canvas.on("mouse:down", function (opt) {
   var evt = opt.e;
