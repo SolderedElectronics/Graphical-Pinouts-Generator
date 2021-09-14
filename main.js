@@ -3,8 +3,8 @@ let canvas = new fabric.Canvas("c", {
 });
 
 function canvasResize() {
-  canvas.width = window.innerWidth * 0.75;
-  canvas.height = window.innerHeight;
+  // canvas.width = window.innerWidth * 0.75;
+  // canvas.height = window.innerHeight;
 }
 
 function measureText(pText, pFontSize, pStyle) {
@@ -768,22 +768,22 @@ const imgFileHandler = (e) => {
   }
 };
 
-(function () {
-  var doCheck = true;
-  var check = function () {
-    // canvasResize();
-  };
-  window.addEventListener("resize", function () {
-    if (doCheck) {
-      check();
-      doCheck = false;
-      setTimeout(function () {
-        doCheck = true;
-        check();
-      }, 500);
-    }
-  });
-})();
+// (function () {
+//   var doCheck = true;
+//   var check = function () {
+//     // canvasResize();
+//   };
+//   window.addEventListener("resize", function () {
+//     if (doCheck) {
+//       check();
+//       doCheck = false;
+//       setTimeout(function () {
+//         doCheck = true;
+//         check();
+//       }, 500);
+//     }
+//   });
+// })();
 
 // //variables for undo/redo
 // let pause_saving = false;
@@ -891,13 +891,13 @@ const imgFileHandler = (e) => {
 //   }
 // });
 
-window.addEventListener(
-  "keydown",
-  function (e) {
-    if (e.key == "Backspace" || e.key == "Delete") deleteObj();
-  },
-  true
-);
+// window.addEventListener(
+//   "keydown",
+//   function (e) {
+//     if (e.key == "Backspace" || e.key == "Delete") deleteObj();
+//   },
+//   true
+// );
 
 canvas.on("mouse:down", function (opt) {
   var evt = opt.e;

@@ -45,35 +45,15 @@
 
     <div style="height: 100%; width: 99%; margin: 0; padding: 0;">
 
-        <div class="row justify-content-around" style="height: 100%;">
-            <div style="height: 100%;">
+        <div style=" display: flex;flex-direction: row;align-items: stretch;width: 100%;">
+            <div style="height: 100%;flex: 1; overflow: hidden;flex-direction: column;">
                 <div
                     style="position: absolute; z-index: 2; margin-top: 10px; margin-left: 10px; color: #7025BA; font-family: GT-Pressura;">
                     <h3>Soldered Graphic Pinout Designer</h3>
                 </div>
-                <canvas width="1050" height="750" id="c"></canvas>
-                <footer class="d-flex justify-content-around"
-                    style="color: white; background-color: #7025BA; position: absolute;bottom: 0; left:0;width: 1050px;height: 2.5rem;">
-                    <span>
-                        Made by
-                        <a href="https://www.soldered.com/" target="_blank">soldered.com</a>
-                    </span>
-
-                    <span>
-                        Work in progress, please
-                        <a href="https://github.com/e-radionicacom/Graphical-Pinouts-Generator/issues"
-                            target="_blank">report</a>
-                        all issues.
-                    </span>
-
-                    <span>
-                        Open Source Software:
-                        <a href="https://github.com/e-radionicacom/Inkplate-GUI-Designer" target="_blank">GitHub
-                            Repo</a>
-                    </span>
-                </footer>
+                <canvas width="1500" height="1000" id="c"></canvas>
             </div>
-            <div style="height: 100%;">
+            <div style="height: 100%;background-color: white;">
                 <div
                     style="width: 340px;overflow-x: hidden;overflow-y: scroll;flex:1;flex-direction: column;height: 100%;">
                     <hr>
@@ -248,6 +228,26 @@
                 </div>
             </div>
         </div>
+        <footer class="d-flex justify-content-around"
+            style="color: white; background-color: #7025BA; width: 100%; position: absolute;bottom: 0; left:0;height: 2.5rem;flex:1">
+            <span>
+                Made by
+                <a href="https://www.soldered.com/" target="_blank">soldered.com</a>
+            </span>
+
+            <span>
+                Work in progress, please
+                <a href="https://github.com/e-radionicacom/Graphical-Pinouts-Generator/issues"
+                    target="_blank">report</a>
+                all issues.
+            </span>
+
+            <span>
+                Open Source Software:
+                <a href="https://github.com/e-radionicacom/Inkplate-GUI-Designer" target="_blank">GitHub
+                    Repo</a>
+            </span>
+        </footer>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
