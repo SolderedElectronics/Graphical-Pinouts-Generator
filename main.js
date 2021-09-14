@@ -533,10 +533,10 @@ function downloadCanvas() {
     options = {
       multiplier: 4,
       format: "png",
-      left: template.getBoundingRect(true).left,
-      top: template.getBoundingRect(true).top,
-      width: template.getBoundingRect(true).width,
-      height: template.getBoundingRect(true).height,
+      left: template.getBoundingRect(false).left,
+      top: template.getBoundingRect(false).top,
+      width: template.getBoundingRect(false).width,
+      height: template.getBoundingRect(false).height,
     };
   }
 
