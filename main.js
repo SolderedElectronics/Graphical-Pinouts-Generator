@@ -50,8 +50,8 @@ const defaultJson = [
     "SCK",
     "TXD",
     "SDA",
-    "AREF",
     "PWM",
+    "AREF",
   ],
 ];
 
@@ -85,8 +85,10 @@ canvas.on("text:editing:exited", function (e) {
   refresh(e.target.group);
 });
 
-function lockImage() {
-  let obj = canvas.getActiveObject();
+function lockImage(obj) {
+  if (!obj) {
+    obj = canvas.getActiveObject();
+  }
 
   if (!obj || obj.type != "image") return;
 
@@ -214,8 +216,13 @@ canvas.on("mouse:down", function (options) {
 });
 
 canvas.on("selection:created", function (e) {
-  e.target.bringToFront();
-  canvas.bringToFront(e.target);
+  if (e.target != template) {
+    e.target.bringToFront();
+    canvas.bringToFront(e.target);
+  } else {
+    e.target.sendToBack();
+    canvas.sendToBack(e.target);
+  }
 
   if (e.target.ignore) return;
 
@@ -227,8 +234,13 @@ canvas.on("selection:created", function (e) {
   } else document.getElementById("pins").value = "";
 });
 canvas.on("selection:updated", function (e) {
-  e.target.bringToFront();
-  canvas.bringToFront(e.target);
+  if (e.target != template) {
+    e.target.bringToFront();
+    canvas.bringToFront(e.target);
+  } else {
+    e.target.sendToBack();
+    canvas.sendToBack(e.target);
+  }
 
   if (e.target.ignore) return;
 
@@ -512,8 +524,24 @@ function downloadURI(uri, name) {
 }
 
 function downloadCanvas() {
+  let options = {
+    multiplier: 4,
+    format: "png",
+  };
+
+  if (template) {
+    options = {
+      multiplier: 4,
+      format: "png",
+      left: template.getBoundingRect().left,
+      top: template.getBoundingRect().top,
+      width: template.getBoundingRect().width,
+      height: template.getBoundingRect().height,
+    };
+  }
+
   downloadURI(
-    canvas.toDataURL({ multiplier: 4 }),
+    canvas.toDataURL(options),
     `outputPinout${new Date().toJSON().slice(0, 10).replace(/-/g, "-")}.jpg`
   );
 }
@@ -523,6 +551,46 @@ canvas.on("after:render", function () {
 });
 
 /// =================================================================
+
+let template = null;
+
+const loadTemplateHandler = (i) => {
+  const urls = [
+    "assets/Unbranded-template.jpg",
+    "assets/Soldered-template.jpg",
+  ];
+
+  if (template) canvas.remove(template);
+
+  fabric.Image.fromURL(urls[i], function (myImg) {
+    //i create an extra var for to change some image properties
+    var img1 = myImg;
+
+    img1.ignore = true;
+
+    img1.scaleToHeight(300);
+    img1.scaleToWidth(300);
+
+    template = img1;
+
+    canvas.add(img1);
+
+    img1.scaleToHeight(canvas.height * 0.9);
+    img1.scaleToWidth(canvas.width * 0.9);
+    img1.center();
+
+    img1.sendToBack();
+    canvas.sendToBack(img1);
+
+    canvas.setActiveObject(img1);
+
+    img1.name = "Template";
+    lockImage(img1);
+
+    canvas.calcOffset();
+    canvas.renderAll();
+  });
+};
 
 const loadIconHandler = (i) => {
   const urls = [
@@ -535,6 +603,7 @@ const loadIconHandler = (i) => {
     "assets/062-easyC-Front.png",
     "assets/button.svg",
     "assets/063-OSH.png",
+    "assets/Legend-Soldered-pinouts.jpg",
   ];
 
   if (urls[i].endsWith(".svg")) {
