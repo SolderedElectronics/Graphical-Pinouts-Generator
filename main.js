@@ -529,21 +529,52 @@ function downloadCanvas() {
     format: "png",
   };
 
+  let z, xl, yl;
+
   if (template) {
+    z = canvas.getZoom();
+    canvas.setZoom(1.0);
+
+    canvas.renderAll();
+
+    xl = canvas.getVpCenter().x - canvas.width / 2;
+    yl = canvas.getVpCenter().y - canvas.height / 2;
+
+    canvas.renderAll();
+
+    canvas.setZoom(1); // reset zoom so pan actions work as expected
+
+    let x = template.left; // x is the location where the top left of the viewport should be
+    let y = template.top; // y idem
+    canvas.absolutePan({ x: x, y: y });
+
+    canvas.renderAll();
+
+    // alert();
+
     options = {
       multiplier: 4,
       format: "png",
-      left: template.getBoundingRect(false).left,
-      top: template.getBoundingRect(false).top,
-      width: template.getBoundingRect(false).width,
-      height: template.getBoundingRect(false).height,
+      left: 0,
+      top: 0,
+      width: template.width * template.scaleX,
+      height: template.height * template.scaleY,
     };
   }
 
+  console.log(options);
   downloadURI(
     canvas.toDataURL(options),
     `outputPinout${new Date().toJSON().slice(0, 10).replace(/-/g, "-")}.jpg`
   );
+
+  if (template) {
+    // console.log(xl, yl, z);
+    canvas.absolutePan({ x: xl, y: yl });
+    canvas.setZoom(z);
+
+    canvas.renderAll();
+  }
 }
 
 canvas.on("after:render", function () {
