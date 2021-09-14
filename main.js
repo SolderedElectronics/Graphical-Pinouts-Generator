@@ -524,8 +524,8 @@ function refresh(obj) {
 function makeNew(i) {
   const defaults = [
     [
-      ["", "VCC"],
       ["", "", "GND"],
+      ["", "VCC"],
       ["", "", "", "SDA"],
       ["", "", "", "SCL"],
     ],
@@ -891,9 +891,13 @@ const imgFileHandler = (e) => {
 //   }
 // });
 
-window.addEventListener("keydown", function (e) {
-  if (e.key == 46 || e.key == 8) deleteObj();
-});
+window.addEventListener(
+  "keydown",
+  function (e) {
+    if (e.key == "Backspace" || e.key == "Delete") deleteObj();
+  },
+  true
+);
 
 canvas.on("mouse:down", function (opt) {
   var evt = opt.e;
