@@ -521,7 +521,20 @@ function refresh(obj) {
   );
 }
 
-function makeNew() {
+function makeNew(i) {
+  const defaults = [
+    [
+      ["", "VCC"],
+      ["", "", "GND"],
+      ["", "", "", "SDA"],
+      ["", "", "", "SCL"],
+    ],
+    [],
+    defaultJson,
+  ];
+  if (i == 2) document.getElementById("align").checked = true;
+
+  document.getElementById("pins").value = JSON.stringify(defaults[i]);
   document.getElementById("right").checked = "true";
   renderOne(250, 250, document.getElementById("right").checked);
 }
@@ -630,6 +643,7 @@ const loadTemplateHandler = (i) => {
   const urls = [
     "assets/Unbranded-template.png",
     "assets/Soldered-template.png",
+    "assets/Soldered-Breakout-Template.png",
   ];
 
   if (template) {
