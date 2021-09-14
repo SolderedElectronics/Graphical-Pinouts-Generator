@@ -501,6 +501,12 @@ function makeNew() {
 
 function deleteObj() {
   canvas.getActiveObjects().forEach((obj) => {
+    if (obj == template) {
+      canvas.remove(obj);
+      template = null;
+      template_button = null;
+    }
+
     if (obj.type == "image") obj.visible = false;
     // https://github.com/fabricjs/fabric.js/issues/7359
     else canvas.remove(obj);
@@ -570,7 +576,6 @@ function downloadCanvas() {
 
   // lock texta
 
-  console.log(options);
   downloadURI(
     canvas.toDataURL(options),
     `outputPinout${new Date().toJSON().slice(0, 10).replace(/-/g, "-")}.jpg`
@@ -594,6 +599,8 @@ canvas.on("after:render", function () {
 let template = null;
 let template_button = null;
 
+// boju teksta ne mijenja
+
 const loadTemplateHandler = (i) => {
   const urls = [
     "assets/Unbranded-template.jpg",
@@ -601,8 +608,7 @@ const loadTemplateHandler = (i) => {
   ];
 
   if (template) {
-    template_button.click();
-    canvas.remove(template);
+    return;
   }
 
   fabric.Image.fromURL(urls[i], function (myImg) {
