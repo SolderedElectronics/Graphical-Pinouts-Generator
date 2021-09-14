@@ -90,10 +90,11 @@ function lockImage(obj) {
     obj = canvas.getActiveObject();
   }
 
-  if (!obj || obj.type != "image") return;
+  if (!obj) return;
+  // if (!obj || obj.type != "image") return;
 
   let btn = document.createElement("button");
-  btn.innerHTML = obj.name;
+  btn.innerHTML = obj.name || obj.type;
   btn.canvasElement = obj;
 
   btn.style.flex = "1";
@@ -111,8 +112,8 @@ function lockImage(obj) {
 
   obj.selectable = false;
   obj.evented = false;
-  canvas.sendToBack(obj);
-  obj.sendToBack();
+  // canvas.sendToBack(obj);
+  // obj.sendToBack();
 
   canvas.discardActiveObject().renderAll();
 }
@@ -511,7 +512,7 @@ window.onload = () => {
   renderOne(200, 250, true);
   renderOne(200, 350, false);
 
-  undo_stack.push(JSON.stringify(canvas));
+  // undo_stack.push(JSON.stringify(canvas));
 };
 
 function downloadURI(uri, name) {
@@ -728,111 +729,111 @@ const imgFileHandler = (e) => {
   });
 })();
 
-//variables for undo/redo
-let pause_saving = false;
-let undo_stack = [];
-let redo_stack = [];
+// //variables for undo/redo
+// let pause_saving = false;
+// let undo_stack = [];
+// let redo_stack = [];
 
-canvas.on("object:added", function (event) {
-  if (!pause_saving) {
-    undo_stack.push(
-      JSON.stringify(
-        canvas.toObject(["id", "l", "r", "input", "t", "idx", "bg"])
-      )
-    );
-    redo_stack = [];
-    // console.log("Object added, state saved", undo_stack);
-  }
-});
-canvas.on("object:modified", function (event) {
-  if (!pause_saving) {
-    undo_stack.push(
-      JSON.stringify(
-        canvas.toObject(["id", "l", "r", "input", "t", "idx", "bg"])
-      )
-    );
-    redo_stack = [];
-    // console.log("Object modified, state saved", undo_stack);
-  }
-});
-canvas.on("object:removed", function (event) {
-  if (!pause_saving) {
-    undo_stack.push(
-      JSON.stringify(
-        canvas.toObject(["id", "l", "r", "input", "t", "idx", "bg"])
-      )
-    );
-    redo_stack = [];
-    // console.log("Object removed, state saved", undo_stack);
-  }
-});
+// canvas.on("object:added", function (event) {
+//   if (!pause_saving) {
+//     undo_stack.push(
+//       JSON.stringify(
+//         canvas.toObject(["id", "l", "r", "input", "t", "idx", "bg"])
+//       )
+//     );
+//     redo_stack = [];
+//     // console.log("Object added, state saved", undo_stack);
+//   }
+// });
+// canvas.on("object:modified", function (event) {
+//   if (!pause_saving) {
+//     undo_stack.push(
+//       JSON.stringify(
+//         canvas.toObject(["id", "l", "r", "input", "t", "idx", "bg"])
+//       )
+//     );
+//     redo_stack = [];
+//     // console.log("Object modified, state saved", undo_stack);
+//   }
+// });
+// canvas.on("object:removed", function (event) {
+//   if (!pause_saving) {
+//     undo_stack.push(
+//       JSON.stringify(
+//         canvas.toObject(["id", "l", "r", "input", "t", "idx", "bg"])
+//       )
+//     );
+//     redo_stack = [];
+//     // console.log("Object removed, state saved", undo_stack);
+//   }
+// });
 
-const undo = () => {
-  pause_saving = true;
-  redo_stack.push(undo_stack.pop());
-  let previous_state = undo_stack[undo_stack.length - 1];
-  if (previous_state == null) {
-    previous_state = "{}";
-  }
-  canvas.loadFromJSON(
-    previous_state,
-    function () {
-      canvas.getObjects().forEach((o) => {
-        if (o.id && lastPos[o.id]) {
-          console.log("aa");
+// const undo = () => {
+//   pause_saving = true;
+//   redo_stack.push(undo_stack.pop());
+//   let previous_state = undo_stack[undo_stack.length - 1];
+//   if (previous_state == null) {
+//     previous_state = "{}";
+//   }
+//   canvas.loadFromJSON(
+//     previous_state,
+//     function () {
+//       canvas.getObjects().forEach((o) => {
+//         if (o.id && lastPos[o.id]) {
+//           console.log("aa");
 
-          o.left = lastPos[o.id].x;
-          o.top = lastPos[o.id].y;
-        }
-      });
-      canvas.renderAll();
-    },
-    function (jsonObject, fabricObject) {
-      // jsonObject is the object as represented in the canvasJson
-      // fabricObject is the object that fabric created from this jsonObject
+//           o.left = lastPos[o.id].x;
+//           o.top = lastPos[o.id].y;
+//         }
+//       });
+//       canvas.renderAll();
+//     },
+//     function (jsonObject, fabricObject) {
+//       // jsonObject is the object as represented in the canvasJson
+//       // fabricObject is the object that fabric created from this jsonObject
 
-      // ["id", "l", "r", "input", "t", "idx"]
+//       // ["id", "l", "r", "input", "t", "idx"]
 
-      if (jsonObject.id) fabricObject.id = jsonObject.id;
-      if (jsonObject.l) fabricObject.l = jsonObject.l;
-      if (jsonObject.t) fabricObject.t = jsonObject.t;
-      if (jsonObject.r) fabricObject.r = jsonObject.r;
-      if (jsonObject.input) fabricObject.input = jsonObject.input;
-      if (jsonObject.idx) fabricObject.idx = jsonObject.idx;
-      if (jsonObject.bg) fabricObject.bg = jsonObject.bg;
-    }
-  );
-  pause_saving = false;
-};
+//       if (jsonObject.id) fabricObject.id = jsonObject.id;
+//       if (jsonObject.l) fabricObject.l = jsonObject.l;
+//       if (jsonObject.t) fabricObject.t = jsonObject.t;
+//       if (jsonObject.r) fabricObject.r = jsonObject.r;
+//       if (jsonObject.input) fabricObject.input = jsonObject.input;
+//       if (jsonObject.idx) fabricObject.idx = jsonObject.idx;
+//       if (jsonObject.bg) fabricObject.bg = jsonObject.bg;
+//     }
+//   );
+//   pause_saving = false;
+// };
 
-const redo = () => {
-  pause_saving = true;
-  state = redo_stack.pop();
-  if (state != null) {
-    undo_stack.push(state);
-    canvas.loadFromJSON(state, function () {
-      canvas.renderAll();
-    });
-    pause_saving = false;
-  }
-};
+// const redo = () => {
+//   pause_saving = true;
+//   state = redo_stack.pop();
+//   if (state != null) {
+//     undo_stack.push(state);
+//     canvas.loadFromJSON(state, function () {
+//       canvas.renderAll();
+//     });
+//     pause_saving = false;
+//   }
+// };
 
-//Listen for undo/redo
-window.addEventListener("keydown", function (e) {
-  let repeat = e.repeat,
-    metaKey = e.metaKey,
-    key = e.key,
-    shiftKey = e.shiftKey,
-    ctrlKey = e.ctrlKey;
+// //Listen for undo/redo
+// window.addEventListener("keydown", function (e) {
+//   let repeat = e.repeat,
+//     metaKey = e.metaKey,
+//     key = e.key,
+//     shiftKey = e.shiftKey,
+//     ctrlKey = e.ctrlKey;
 
-  //Undo - CTRL+Z
-  if (repeat) return;
-  if ((metaKey || ctrlKey) && !shiftKey && key === "z") {
-    undo();
-  } else if ((metaKey || ctrlKey) && shiftKey && key === "z") {
-    redo();
-  }
-});
+//   //Undo - CTRL+Z
+//   if (repeat) return;
+//   if ((metaKey || ctrlKey) && !shiftKey && key === "z") {
+//     undo();
+//   } else if ((metaKey || ctrlKey) && shiftKey && key === "z") {
+//     redo();
+//   }
+// });
 
 canvas.on("mouse:down", function (opt) {
   var evt = opt.e;
