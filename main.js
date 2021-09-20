@@ -124,7 +124,7 @@ function lockImage(obj) {
 }
 
 canvas.on("mouse:down", function (options) {
-  let groupItems, inp, l, t, r;
+  let groupItems, inp, l, t, r, zx, zy;
   if (options.target) {
     let thisTarget = options.target;
     let mousePos = canvas.getPointer(options.e);
@@ -168,6 +168,9 @@ canvas.on("mouse:down", function (options) {
               t = group.top;
               r = group.angle;
 
+              zx = group.scaleX;
+              zy = group.scaleY;
+
               canvas.remove(group);
               for (let i = 0; i < groupItems.length; i++) {
                 if (groupItems[i] != "textbox") {
@@ -207,6 +210,8 @@ canvas.on("mouse:down", function (options) {
                 grp.left = l;
                 grp.top = t;
                 grp.angle = r;
+                grp.scaleX = zx;
+                grp.scaleY = zy;
 
                 canvas.add(grp);
                 exitEditing = false;
@@ -376,8 +381,8 @@ class Selector {
             this.leftRight
               ? `M 0 0 L 7 7 L ${w} 7 L ${w + 7} 0 L ${w} -7 L 7 -7 L 0 0 M ${
                   w + 7
-                } 0 L ${w + 14} 0 z`
-              : `M 0 0 L -7 0 M 0 0 L 7 7 L ${w} 7 L ${
+                } 0 L ${w + 14} 0.2 z`
+              : `M 0 0 L -7 0.2 M 0 0 L 7 7 L ${w} 7 L ${
                   w + 7
                 } 0 L ${w} -7 L 7 -7  z`,
             {
@@ -693,6 +698,7 @@ const loadIconHandler = (i) => {
     "assets/button.svg",
     "assets/063-OSH.png",
     "assets/Legend-Soldered-pinouts.jpg",
+    "assets/mounting-hole.png",
   ];
 
   if (urls[i].endsWith(".svg")) {
