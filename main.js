@@ -353,7 +353,7 @@ class Selector {
         left: 5,
         top: 9 + i * 20 + 4,
         fill: "white",
-        stroke: "#FFD700",
+        stroke: "#BCA876",
         radius: 3,
         strokeWidth: 3,
       });
