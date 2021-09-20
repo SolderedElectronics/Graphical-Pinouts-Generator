@@ -351,10 +351,11 @@ class Selector {
 
       let c = new fabric.Circle({
         left: 5,
-        top: 10 + i * 20 + 4,
-        fill: "purple",
-        stroke: "purple",
+        top: 9 + i * 20 + 4,
+        fill: "white",
+        stroke: "#FFD700",
         radius: 3,
+        strokeWidth: 3,
       });
       this.g.addWithUpdate(c);
 
@@ -526,13 +527,13 @@ function makeNew(i) {
     [
       ["", "", "GND"],
       ["", "VCC"],
-      ["", "", "", "SDA"],
-      ["", "", "", "SCL"],
+      ["", "", "", "", "", "", "", "", "", "SDA"],
+      ["", "", "", "", "", "", "", "", "", "SCL"],
     ],
     [],
     defaultJson,
   ];
-  if (i == 2) document.getElementById("align").checked = true;
+  if (i == 0) document.getElementById("align").checked = true;
 
   document.getElementById("pins").value = JSON.stringify(defaults[i]);
   document.getElementById("right").checked = "true";
@@ -730,11 +731,11 @@ const loadTextHandler = (i) => {
   var t = new fabric.Textbox("Textbox", {
     top: 100,
     left: 100,
-    fontSize: 12,
+    fontSize: 96,
     textAlign: "center",
     fixedWidth: 150,
     fontFamily: "GT-Pressura",
-    fill: ["black", "#7025BA"][i],
+    fill: ["black", "#7025BA", "#25BAA8", "#BCA876"][i],
   });
 
   canvas.add(t);
