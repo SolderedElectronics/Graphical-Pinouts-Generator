@@ -65,11 +65,15 @@ canvas.on("before:selection:cleared", function (e) {
   if (!wa && !e.target.ignore) document.getElementById("pins").value = "";
 
   if (e.target.type == "group") {
+    // let o = canvas.getActiveObject();
+    // setTimeout((e) => {
+    //   refresh(o, parseInt(document.getElementById("plDist").value));
+    // }, 10);
+
     document.getElementById("plDistDiv").style.display = "none";
     canvas.getActiveObject().plDist = parseInt(
       document.getElementById("plDist").value
     );
-    refresh(canvas.getActiveObject());
   }
 });
 
