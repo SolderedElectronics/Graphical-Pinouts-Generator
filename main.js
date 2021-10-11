@@ -69,6 +69,7 @@ canvas.on("before:selection:cleared", function (e) {
     canvas.getActiveObject().plDist = parseInt(
       document.getElementById("plDist").value
     );
+    refresh(canvas.getActiveObject());
   }
 });
 
