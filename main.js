@@ -63,6 +63,13 @@ canvas.backgroundColor = "#f1f0f0";
 
 canvas.on("before:selection:cleared", function (e) {
   if (!wa && !e.target.ignore) document.getElementById("pins").value = "";
+
+  if (e.target.type == "group") {
+    document.getElementById("plDistDiv").style.display = "none";
+    canvas.getActiveObject().plDist = parseInt(
+      document.getElementById("plDist").value
+    );
+  }
 });
 
 canvas.on("text:editing:exited", function (e) {
@@ -103,7 +110,6 @@ function lockImage(obj) {
   btn.style.marginRight = "10px";
 
   btn.onclick = (e) => {
-    console.log("ckicker");
     e.target.canvasElement.selectable = true;
     e.target.canvasElement.evented = true;
     canvas.setActiveObject(obj);
@@ -226,6 +232,13 @@ canvas.on("mouse:down", function (options) {
   }
 });
 
+function updatePlDist(v) {
+  if (canvas.getActiveObject()) {
+    canvas.getActiveObject().plDist = parseInt(v);
+    refresh(canvas.getActiveObject());
+  }
+}
+
 canvas.on("selection:created", function (e) {
   if (e.target != template) {
     e.target.bringToFront();
@@ -239,7 +252,11 @@ canvas.on("selection:created", function (e) {
 
   if (e.target.type == "group") {
     document.getElementById("pins").value = e.target.input;
-
+    document.getElementById("plDistDiv").style.display = "block";
+    if (!e.target.plDist) {
+      e.target.plDist = 0;
+      document.getElementById("plDist").value = "0";
+    }
     if (e.target.leftRight) document.getElementById("right").checked = true;
     else document.getElementById("left").checked = true;
   } else document.getElementById("pins").value = "";
@@ -257,7 +274,11 @@ canvas.on("selection:updated", function (e) {
 
   if (e.target.type == "group") {
     document.getElementById("pins").value = e.target.input;
-
+    document.getElementById("plDistDiv").style.display = "block";
+    if (!e.target.plDist) {
+      e.target.plDist = 0;
+      document.getElementById("plDist").value = "0";
+    }
     if (e.target.leftRight) document.getElementById("right").checked = true;
     else document.getElementById("left").checked = true;
   } else document.getElementById("pins").value = "";
@@ -269,7 +290,7 @@ const padding = 20;
 const alignTo = true;
 
 class Selector {
-  constructor(l, t, lr, sx, sy, r, inp, id) {
+  constructor(l, t, lr, sx, sy, r, inp, id, plDist) {
     this.g = new fabric.Group();
     this.g.snapAngle = 15;
 
@@ -277,6 +298,11 @@ class Selector {
     this.t = t;
     this.input = inp;
     this.id = id;
+
+    if (plDist) this.g.plDist = plDist;
+    else this.g.plDist = 0;
+
+    // console.log(this.g.plDist);
 
     if (sx) this.sx = sx;
     else this.sx = 1.0;
@@ -339,6 +365,7 @@ class Selector {
           10 + -(this.leftRight * 2 - 1) * (pwm[i] ? 20 : 0),
           10 + i * 20 + 6.7,
           7 +
+            (this.leftRight ? -this.g.plDist : this.g.plDist) +
             -(this.leftRight * 2 - 1) *
               (!document.getElementById("align").checked ? widths[k + 1] : 25),
           10 + i * 20 + 6.7,
@@ -390,6 +417,7 @@ class Selector {
               strokeWidth: 1,
               fill: document.getElementById("color" + j).value,
               left:
+                (this.leftRight ? -this.g.plDist : this.g.plDist) +
                 (this.leftRight ? -w : 0) +
                 (this.leftRight ? -25 : 30) +
                 (document.getElementById("align").checked
@@ -404,6 +432,7 @@ class Selector {
 
           let txt = new fabric.Textbox(data[i][j], {
             left:
+              (this.leftRight ? -this.g.plDist : this.g.plDist) +
               (this.leftRight ? -w : 0) +
               (this.leftRight ? -17 : 44) +
               (document.getElementById("align").checked
@@ -460,7 +489,18 @@ function updateColors() {
 }
 
 function renderOne(l, t, lr, sx, sy, r, inp, fallback) {
-  let s = new Selector(l, t, lr, sx, sy, r, inp);
+  // if (fallback) console.log(fallback.plDist);
+  let s = new Selector(
+    l,
+    t,
+    lr,
+    sx,
+    sy,
+    r,
+    inp,
+    null,
+    fallback ? fallback.plDist : 0
+  );
 
   try {
     let t = document.getElementById("pins").value;
@@ -506,7 +546,8 @@ function refresh(obj) {
     sx = obj.scaleX,
     sy = obj.scaleY,
     r = obj.angle,
-    inp = obj.input;
+    inp = obj.input,
+    plDist = obj.plDist;
 
   if (document.getElementById("pins").value)
     inp = document.getElementById("pins").value;
