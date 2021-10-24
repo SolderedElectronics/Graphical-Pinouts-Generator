@@ -357,7 +357,9 @@ class Selector {
           {
             stroke: "black",
             strokeWidth: 1,
-            left: this.leftRight ? -18 : 8,
+            left:
+              (this.leftRight ? -this.g.plDist : this.g.plDist) +
+              (this.leftRight ? -18 : 8),
             top: 10 + i * 20,
             fill: "",
           }
@@ -367,9 +369,10 @@ class Selector {
 
       let line = new fabric.Line(
         [
-          10 + -(this.leftRight * 2 - 1) * (pwm[i] ? 20 : 0),
+          10 + -(this.leftRight * 2 - 1), //* (pwm[i] ? 20 : 0),
           10 + i * 20 + 6.7,
           7 +
+            (this.leftRight ? -1 : 1) * (pwm[i] ? -500 : 0) +
             (this.leftRight ? -this.g.plDist : this.g.plDist) +
             -(this.leftRight * 2 - 1) *
               (!document.getElementById("align").checked ? widths[k + 1] : 25),
