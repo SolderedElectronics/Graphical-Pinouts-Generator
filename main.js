@@ -372,7 +372,7 @@ class Selector {
           10 + -(this.leftRight * 2 - 1), //* (pwm[i] ? 20 : 0),
           10 + i * 20 + 6.7,
           7 +
-            (this.leftRight ? -1 : 1) * (pwm[i] ? -500 : 0) +
+            (this.leftRight ? -1 : 1) * (pwm[i] ? -498 : 0) +
             (this.leftRight ? -this.g.plDist : this.g.plDist) +
             -(this.leftRight * 2 - 1) *
               (!document.getElementById("align").checked ? widths[k + 1] : 25),
