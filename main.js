@@ -799,6 +799,7 @@ const loadIconHandler = (i) => {
   if (urls[i].endsWith(".svg")) {
     fabric.loadSVGFromURL(urls[i], function (objects, options) {
       var g = fabric.util.groupSVGElements(objects, options);
+      g.snapAngle = 15;
       canvas.add(g);
       g.set({ left: 100, top: 100 });
 
@@ -808,8 +809,6 @@ const loadIconHandler = (i) => {
       g.ignore = true;
       canvas.calcOffset();
       canvas.renderAll();
-
-      g.snapAngle = 15;
 
       canvas.setActiveObject(g);
     });
