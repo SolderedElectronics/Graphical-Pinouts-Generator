@@ -36,11 +36,10 @@ function measureText(pText, pFontSize, pStyle) {
 }
 
 const defaultJson = [
-  ["D4", "", "", "", "", "", "", "", "", "", "", ""],
-  ["D4", "", "", "", "", "", "", "", "", "", "", ""],
-  ["D4", "", "", "", "", "", "", "", "", "", "", ""],
+  ["", "", "", "", "", "", "", "", "", "", "", "D4"],
+  ["", "", "", "", "", "", "", "", "", "", "", "D4"],
+  ["", "", "", "", "", "", "", "", "", "", "", "D4"],
   [
-    "D4",
     "3V3",
     "GND",
     "RST",
@@ -52,6 +51,7 @@ const defaultJson = [
     "SDA",
     "PWM",
     "AREF",
+    "D4",
   ],
 ];
 
@@ -367,27 +367,31 @@ class Selector {
         this.g.addWithUpdate(pwmP);
       }
 
-      let line = new fabric.Line(
-        [
-          10 + -(this.leftRight * 2 - 1), //* (pwm[i] ? 20 : 0),
-          10 + i * 20 + 6.7,
-          7 +
-            (this.leftRight ? -1 : 1) * (pwm[i] ? -498 : 0) +
-            (this.leftRight ? -this.g.plDist : this.g.plDist) +
-            -(this.leftRight * 2 - 1) *
-              (!document.getElementById("align").checked ? widths[k + 1] : 25),
-          10 + i * 20 + 6.7,
-        ],
-        {
-          fill: "black",
-          stroke: "black",
-          strokeWidth: 1,
-          selectable: false,
-          evented: false,
-        }
-      );
-      this.g.addWithUpdate(line);
-      line.moveTo(-2);
+      if (!pwm[i]) {
+        let line = new fabric.Line(
+          [
+            10 + -(this.leftRight * 2 - 1), //* (pwm[i] ? 20 : 0),
+            10 + i * 20 + 6.7,
+            7 +
+              (this.leftRight ? -1 : 1) * (pwm[i] ? -498 : 0) +
+              (this.leftRight ? -this.g.plDist : this.g.plDist) +
+              -(this.leftRight * 2 - 1) *
+                (!document.getElementById("align").checked
+                  ? widths[k + 1]
+                  : 25),
+            10 + i * 20 + 6.7,
+          ],
+          {
+            fill: "black",
+            stroke: "black",
+            strokeWidth: 1,
+            selectable: false,
+            evented: false,
+          }
+        );
+        this.g.addWithUpdate(line);
+        line.moveTo(-2);
+      }
 
       let c = new fabric.Circle({
         left: 5,
@@ -448,13 +452,19 @@ class Selector {
                 : -(this.leftRight * 2 - 1) * widths[j]),
             top: 10 + i * 20,
             fill: getContrastYIQ(document.getElementById("color" + j).value),
-            width: 20,
             fontSize: 12,
+            // textAlign: "center",
+            // width: widths[j] - (j ? widths[j - 1] : 0),
             fontcolor: getContrastYIQ(
               document.getElementById("color" + j).value
             ),
             fontFamily: "GT-Pressura",
           });
+
+          txt.textAlign = "center";
+          txt.width = preWidths[j];
+
+          // console.log(widths);
           txt.idx = i + ", " + j;
           txt.bg = ph;
 
@@ -586,33 +596,33 @@ function makeNew(i) {
     ],
     defaultJson,
     [
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "SDA", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "SCL", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D5", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D5", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D5", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D5", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
+      ["", "", "", "GPIO5", "", "", "", "", "SDA", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "SCL", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D5"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D5"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D5"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D5"],
       ["", "", "GND", "", "", "", "", "", "", "", "", ""],
     ],
     [
-      ["D4", "", "", "", "GPIO5", "", "", "", "RXD", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "TXD", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "MISO", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "MOSI", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "SCK", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "CS", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
-      ["D4", "", "", "", "GPIO5", "", "", "", "", "", "", ""],
+      ["", "", "", "GPIO5", "", "", "", "RXD", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "TXD", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "MISO", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "MOSI", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "SCK", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "CS", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
+      ["", "", "", "GPIO5", "", "", "", "", "", "", "", "D4"],
       ["", "", "", "RESET", "", "", "", "", "", "", "", ""],
       ["", "3V3", "", "", "", "", "", "", "", "", "", ""],
       ["", "", "GND", "", "", "", "", "", "", "", "", ""],
@@ -806,6 +816,8 @@ const loadIconHandler = (i) => {
       //i create an extra var for to change some image properties
       var img1 = myImg.set({ left: 100, top: 100 });
 
+      img1.snapAngle = 15;
+
       img1.ignore = true;
       canvas.calcOffset();
       canvas.renderAll();
@@ -843,6 +855,7 @@ const imgFileHandler = (e) => {
     fr.onload = function () {
       fabric.Image.fromURL(fr.result, function (myImg) {
         var img1 = myImg;
+        img1.snapAngle = 15;
         img1.name =
           "img" + imgCounter++ + "_" + files[0].name.replace(" ", "_");
 
