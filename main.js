@@ -809,6 +809,8 @@ const loadIconHandler = (i) => {
       canvas.calcOffset();
       canvas.renderAll();
 
+      g.snapAngle = 15;
+
       canvas.setActiveObject(g);
     });
   } else
