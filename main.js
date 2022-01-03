@@ -74,6 +74,9 @@ canvas.on("before:selection:cleared", function (e) {
     canvas.getActiveObject().plDist = parseInt(
       document.getElementById("plDist").value
     );
+    canvas.getActiveObject().offsetXY = parseInt(
+      document.getElementById("offsetXY").value
+    );
   }
 });
 
@@ -237,6 +240,13 @@ canvas.on("mouse:down", function (options) {
   }
 });
 
+function updateOffsetXY(v) {
+  if (canvas.getActiveObject()) {
+    canvas.getActiveObject().offsetXY = parseInt(v);
+    refresh(canvas.getActiveObject());
+  }
+}
+
 function updatePlDist(v) {
   if (canvas.getActiveObject()) {
     canvas.getActiveObject().plDist = parseInt(v);
@@ -261,6 +271,10 @@ canvas.on("selection:created", function (e) {
     if (!e.target.plDist) {
       e.target.plDist = 0;
       document.getElementById("plDist").value = "0";
+    }
+    if (!e.target.offsetXY) {
+      e.target.offsetXY = 0;
+      document.getElementById("offsetXY").value = "0";
     }
     if (e.target.leftRight) document.getElementById("right").checked = true;
     else document.getElementById("left").checked = true;
@@ -295,7 +309,7 @@ const padding = 20;
 const alignTo = true;
 
 class Selector {
-  constructor(l, t, lr, sx, sy, r, inp, id, plDist) {
+  constructor(l, t, lr, sx, sy, r, inp, id, plDist, offsetXY) {
     this.g = new fabric.Group();
     this.g.snapAngle = 15;
 
@@ -306,6 +320,9 @@ class Selector {
 
     if (plDist) this.g.plDist = plDist;
     else this.g.plDist = 0;
+
+    if (offsetXY) this.g.offsetXY = offsetXY;
+    else this.g.offsetXY = 0;
 
     // console.log(this.g.plDist);
 
@@ -327,6 +344,9 @@ class Selector {
   render(data) {
     let widths = new Array(data[0].length).fill(0);
     let pwm = new Array(data[0].length).fill(0);
+
+    // this.g.offsetXY = 5;
+
     for (let i = 0; i < data.length; ++i) {
       for (let j = 0; j < data[i].length; ++j) {
         if (!data[i][j] && !document.getElementById("align").checked) continue;
@@ -358,40 +378,95 @@ class Selector {
             stroke: "black",
             strokeWidth: 1,
             left:
+              3 +
+              (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
               (this.leftRight ? -this.g.plDist : this.g.plDist) +
               (this.leftRight ? -18 : 8),
-            top: 10 + i * 20,
+            top: -this.g.offsetXY + 10 + i * 20,
             fill: "",
           }
         );
         this.g.addWithUpdate(pwmP);
       }
 
-      if (!pwm[i]) {
-        let line = new fabric.Line(
-          [
-            10 + -(this.leftRight * 2 - 1), //* (pwm[i] ? 20 : 0),
-            10 + i * 20 + 6.7,
-            7 +
-              (this.leftRight ? -1 : 1) * (pwm[i] ? -498 : 0) +
-              (this.leftRight ? -this.g.plDist : this.g.plDist) +
-              -(this.leftRight * 2 - 1) *
-                (!document.getElementById("align").checked
-                  ? widths[k + 1]
-                  : 25),
-            10 + i * 20 + 6.7,
-          ],
-          {
-            fill: "black",
-            stroke: "black",
-            strokeWidth: 1,
-            selectable: false,
-            evented: false,
-          }
-        );
-        this.g.addWithUpdate(line);
-        line.moveTo(-2);
-      }
+      let line2 = new fabric.Line(
+        [
+          (this.leftRight ? -1 : 1) * this.g.plDist +
+            (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
+            (this.leftRight ? -1 : 1) * (pwm[i] ? 20 : 0) +
+            +10 +
+            -(this.leftRight * 2 - 1),
+          //---
+          -this.g.offsetXY + 10 + i * 20 + 6.7,
+
+          //---
+          (this.leftRight ? -1 : 1) * this.g.plDist +
+            (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
+            +10 +
+            -(this.leftRight * 2 - 1) +
+            (this.leftRight ? -1 : 1) *
+              (document.getElementById("align").checked ? 0 : widths[k + 1]),
+          //---
+          -this.g.offsetXY + 10 + i * 20 + 6.7,
+        ],
+        {
+          fill: "black",
+          stroke: "black",
+          strokeWidth: 1,
+          selectable: false,
+          evented: false,
+        }
+      );
+      this.g.addWithUpdate(line2);
+      line2.moveTo(-2);
+
+      let line3 = new fabric.Line(
+        [
+          (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
+            +10 +
+            -(this.leftRight * 2 - 1),
+          //---
+          -this.g.offsetXY + 10 + i * 20 + 6.7,
+
+          //---
+          (this.leftRight ? -1 : 1) * this.g.plDist +
+            (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
+            +10 +
+            -(this.leftRight * 2 - 1),
+          //---
+          -this.g.offsetXY + 10 + i * 20 + 6.7,
+        ],
+        {
+          fill: "black",
+          stroke: "black",
+          strokeWidth: 1,
+          selectable: false,
+          evented: false,
+        }
+      );
+      this.g.addWithUpdate(line3);
+      line3.moveTo(-2);
+
+      let line1 = new fabric.Line(
+        [
+          +10 + -(this.leftRight * 2 - 1), //* (pwm[i] ? 20 : 0),
+          +10 + i * 20 + 6.7,
+
+          (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
+            +10 +
+            -(this.leftRight * 2 - 1), //* (pwm[i] ? 20 : 0),
+          -this.g.offsetXY + 10 + i * 20 + 6.7,
+        ],
+        {
+          fill: "black",
+          stroke: "black",
+          strokeWidth: 1,
+          selectable: false,
+          evented: false,
+        }
+      );
+      this.g.addWithUpdate(line1);
+      line1.moveTo(-2);
 
       let c = new fabric.Circle({
         left: 5,
@@ -429,13 +504,14 @@ class Selector {
               strokeWidth: 1,
               fill: document.getElementById("color" + j).value,
               left:
+                (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
                 (this.leftRight ? -this.g.plDist : this.g.plDist) +
                 (this.leftRight ? -w : 0) +
                 (this.leftRight ? -25 : 30) +
                 (document.getElementById("align").checked
                   ? -(this.leftRight * 2 - 1) * wt
                   : -(this.leftRight * 2 - 1) * widths[j]),
-              top: 10 + i * 20 + 6.5 - 7,
+              top: -this.g.offsetXY + 10 + i * 20 + 6.5 - 7,
             }
           );
 
@@ -444,13 +520,14 @@ class Selector {
 
           let txt = new fabric.Textbox(data[i][j], {
             left:
+              (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
               (this.leftRight ? -this.g.plDist : this.g.plDist) +
               (this.leftRight ? -w : 0) +
               (this.leftRight ? -17 : 44) +
               (document.getElementById("align").checked
                 ? -(this.leftRight * 2 - 1) * wt
                 : -(this.leftRight * 2 - 1) * widths[j]),
-            top: 10 + i * 20,
+            top: -this.g.offsetXY + 10 + i * 20,
             fill: getContrastYIQ(document.getElementById("color" + j).value),
             fontSize: 12,
             // textAlign: "center",
@@ -517,7 +594,8 @@ function renderOne(l, t, lr, sx, sy, r, inp, fallback) {
     r,
     inp,
     null,
-    fallback ? fallback.plDist : 0
+    fallback ? fallback.plDist : 0,
+    fallback ? fallback.offsetXY : 0
   );
 
   try {
@@ -565,7 +643,8 @@ function refresh(obj) {
     sy = obj.scaleY,
     r = obj.angle,
     inp = obj.input,
-    plDist = obj.plDist;
+    plDist = obj.plDist,
+    offsetXY = obj.offsetXY;
 
   if (document.getElementById("pins").value)
     inp = document.getElementById("pins").value;
@@ -573,6 +652,8 @@ function refresh(obj) {
   wa = 1;
   canvas.remove(obj);
   wa = 0;
+
+  // console.log("aaa");
 
   renderOne(
     l,
@@ -589,10 +670,10 @@ function refresh(obj) {
 function makeNew(i) {
   const defaults = [
     [
-      ["", "", "GND"],
-      ["", "VCC"],
-      ["", "", "", "", "", "", "", "", "", "SDA"],
-      ["", "", "", "", "", "", "", "", "", "SCL"],
+      ["", "GND"],
+      ["VCC"],
+      ["", "", "", "", "", "", "", "", "SDA"],
+      ["", "", "", "", "", "", "", "", "SCL"],
     ],
     defaultJson,
     [
