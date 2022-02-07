@@ -3,8 +3,31 @@ let canvas = new fabric.Canvas("c", {
 });
 
 function canvasResize() {
-  // canvas.width = window.innerWidth * 0.75;
-  // canvas.height = window.innerHeight;
+  // Make it visually fill the positioned parent
+  // c = document.getElementById("c");
+  // c.style.width = "100%";
+  // c.style.height = "100%";
+  // // ...then set the internal size to match
+  // c.width = c.offsetWidth;
+  // c.height = c.offsetHeight;
+
+  for (let i of [
+    document.getElementsByClassName("canvas-container")[0],
+    document.getElementsByClassName("lower-canvas")[0],
+    document.getElementsByClassName("upper-canvas")[0],
+  ]) {
+    // console.log(i);
+    if (i) {
+      i.style.width = "70vw";
+      i.style.height = "80vh";
+
+      // i.style.height = "100%";
+      // i.style
+      // i.style.paddingBottom = "56.25%";
+    }
+  }
+  document.getElementsByClassName("canvas-container")[0].style.margin =
+    "0 auto";
 }
 
 function measureText(pText, pFontSize, pStyle) {
@@ -93,7 +116,7 @@ canvas.on("text:editing:exited", function (e) {
     a[i][j] = e.target.text;
     e.target.group.input = JSON.stringify(a);
   } catch (e) {
-    console.log(e);
+    // console.log(e);
   }
 
   canvas.setActiveObject(e.target.group);
@@ -266,20 +289,28 @@ canvas.on("selection:created", function (e) {
   if (e.target.ignore) return;
 
   if (e.target.type == "group") {
-    document.getElementById("pins").value = e.target.input;
+    if (e.target.input) document.getElementById("pins").value = e.target.input;
+
     document.getElementById("plDistDiv").style.display = "block";
     if (!e.target.plDist) {
       e.target.plDist = 0;
       document.getElementById("plDist").value = "0";
+    } else {
+      document.getElementById("plDist").value = e.target.plDist;
     }
     if (!e.target.offsetXY) {
       e.target.offsetXY = 0;
       document.getElementById("offsetXY").value = "0";
+    } else {
+      document.getElementById("offsetXY").value = e.target.offsetXY;
     }
     if (e.target.leftRight) document.getElementById("right").checked = true;
     else document.getElementById("left").checked = true;
+
+    document.getElementById("align").checked = !!e.target.align;
   } else document.getElementById("pins").value = "";
 });
+
 canvas.on("selection:updated", function (e) {
   if (e.target != template) {
     e.target.bringToFront();
@@ -297,9 +328,21 @@ canvas.on("selection:updated", function (e) {
     if (!e.target.plDist) {
       e.target.plDist = 0;
       document.getElementById("plDist").value = "0";
+    } else {
+      document.getElementById("plDist").value = e.target.plDist;
     }
-    if (e.target.leftRight) document.getElementById("right").checked = true;
-    else document.getElementById("left").checked = true;
+    if (!e.target.offsetXY) {
+      e.target.offsetXY = 0;
+      document.getElementById("offsetXY").value = "0";
+    } else {
+      document.getElementById("offsetXY").value = e.target.offsetXY;
+    }
+    if (e.target.leftRight) {
+      document.getElementById("right").checked = true;
+    } else {
+      document.getElementById("left").checked = true;
+    }
+    document.getElementById("align").checked = !!e.target.align;
   } else document.getElementById("pins").value = "";
 });
 
@@ -309,10 +352,11 @@ const padding = 20;
 const alignTo = true;
 
 class Selector {
-  constructor(l, t, lr, sx, sy, r, inp, id, plDist, offsetXY) {
+  constructor(l, t, lr, sx, sy, r, inp, id, plDist, offsetXY, align) {
     this.g = new fabric.Group();
     this.g.snapAngle = 15;
 
+    this.align = align;
     this.l = l;
     this.t = t;
     this.input = inp;
@@ -335,10 +379,13 @@ class Selector {
     if (r) this.r = r;
     else this.r = 0.0;
 
-    canvas.add(this.g);
+    if (document.getElementById("align").checked) this.g.align = true;
+    document.getElementById("right").checked;
 
     this.leftRight = lr == null ? 0 : lr;
     this.g.leftRight = lr == null ? 0 : lr;
+
+    canvas.add(this.g);
   }
   // delete dodat
   render(data) {
@@ -405,7 +452,7 @@ class Selector {
             +10 +
             -(this.leftRight * 2 - 1) +
             (this.leftRight ? -1 : 1) *
-              (document.getElementById("align").checked ? 0 : widths[k + 1]),
+              (document.getElementById("align").checked ? 25 : widths[k + 1]),
           //---
           -this.g.offsetXY + 10 + i * 20 + 6.7,
         ],
@@ -518,7 +565,11 @@ class Selector {
           this.g.addWithUpdate(ph);
           ph.moveTo(-1);
 
-          let txt = new fabric.Textbox(data[i][j], {
+          const clean = (str) => {
+            return str.replace(/ +(?= )/g, "");
+          };
+
+          let txt = new fabric.Textbox(clean(data[i][j]), {
             left:
               (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
               (this.leftRight ? -this.g.plDist : this.g.plDist) +
@@ -595,7 +646,8 @@ function renderOne(l, t, lr, sx, sy, r, inp, fallback) {
     inp,
     null,
     fallback ? fallback.plDist : 0,
-    fallback ? fallback.offsetXY : 0
+    fallback ? fallback.offsetXY : 0,
+    fallback ? fallback.align : 0
   );
 
   try {
@@ -737,7 +789,7 @@ function deleteObj() {
 }
 
 window.onload = () => {
-  // canvasResize();
+  canvasResize();
 
   document.getElementById("right").checked = "false";
   document.getElementById("left").checked = "true";
@@ -866,7 +918,12 @@ const loadIconHandler = (i) => {
   const urls = [
     "assets/information.svg",
     "assets/warning.svg",
-    "assets/led.svg",
+    "assets/led_blue.svg",
+    "assets/led_green.svg",
+    "assets/led_orange.svg",
+    "assets/led_purple.svg",
+    "assets/led_red.svg",
+    "assets/led_white.svg",
     "assets/select.svg",
     "assets/010-usb.png",
     "assets/043-low-battery.png",
@@ -955,22 +1012,22 @@ const imgFileHandler = (e) => {
   }
 };
 
-// (function () {
-//   var doCheck = true;
-//   var check = function () {
-//     // canvasResize();
-//   };
-//   window.addEventListener("resize", function () {
-//     if (doCheck) {
-//       check();
-//       doCheck = false;
-//       setTimeout(function () {
-//         doCheck = true;
-//         check();
-//       }, 500);
-//     }
-//   });
-// })();
+(function () {
+  var doCheck = true;
+  var check = function () {
+    canvasResize();
+  };
+  window.addEventListener("resize", function () {
+    if (doCheck) {
+      check();
+      doCheck = false;
+      setTimeout(function () {
+        doCheck = true;
+        check();
+      }, 500);
+    }
+  });
+})();
 
 // //variables for undo/redo
 // let pause_saving = false;
