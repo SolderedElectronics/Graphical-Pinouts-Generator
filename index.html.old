@@ -49,7 +49,7 @@
         <div style=" display: flex;flex-direction: row;align-items: stretch;width: 100%;">
             <div style="height: 100%;flex: 1; overflow: hidden;flex-direction: column;">
                 <div
-                    style="position: absolute; z-index: 2; margin-top: 10px; margin-left: 10px; color: #7025BA; font-family: GT-Pressura;">
+                    style="position: absolute; z-index: 2; margin-top: 10px; margin-left: 10px; color: #582C83; font-family: GT-Pressura;">
                     <h3>Soldered Graphic Pinout Designer</h3>
                 </div>
                 <canvas width="1500" height="1000" id="c"></canvas>
@@ -60,7 +60,7 @@
                     <hr>
                     <div class="d-flex justify-content-between">
                         <div class="dropdown">
-                            <a style="background-color: #7025BA;border-color: #7025BA;"
+                            <a style="background-color: #582C83;border-color: #582C83;"
                                 class="btn btn-primary dropdown-toggle" role="button" id="dropdownMenuLink"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Make New
@@ -247,7 +247,7 @@
             </div>
         </div>
         <footer class="d-flex justify-content-around"
-            style="color: white; background-color: #7025BA; width: 100%; position: absolute;bottom: 0; left:0;height: 2.5rem;flex:1">
+            style="color: white; background-color: #582C83; width: 100%; position: absolute;bottom: 0; left:0;height: 2.5rem;flex:1">
             <span>
                 Made by
                 <a href="https://www.soldered.com/" target="_blank">soldered.com</a>

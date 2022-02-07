@@ -977,7 +977,7 @@ const loadTextHandler = (i) => {
     textAlign: "center",
     fixedWidth: 150,
     fontFamily: "GT-Pressura",
-    fill: ["black", "#7025BA", "#25BAA8", "#BCA876"][i],
+    fill: ["black", "#582C83", "#25BAA8", "#BCA876"][i],
   });
 
   canvas.add(t);
