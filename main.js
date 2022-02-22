@@ -101,6 +101,14 @@ canvas.on("before:selection:cleared", function (e) {
       document.getElementById("offsetXY").value
     );
   }
+
+  if (e.target.type == "image") {
+    document.getElementById("heightDiv").style.display = "none";
+
+    canvas.getActiveObject().scaleToHeight(Math.max(10, parseInt(
+      document.getElementById("height").value
+    )));
+  }
 });
 
 canvas.on("text:editing:exited", function (e) {
@@ -263,6 +271,14 @@ canvas.on("mouse:down", function (options) {
   }
 });
 
+function updateHeight(v) {
+  if (canvas.getActiveObject()) {
+    canvas.getActiveObject().scaleToHeight(parseInt(v));
+    // refresh(canvas.getActiveObject());
+    canvas.renderAll();
+  }
+}
+
 function updateOffsetXY(v) {
   if (canvas.getActiveObject()) {
     canvas.getActiveObject().offsetXY = parseInt(v);
@@ -277,6 +293,12 @@ function updatePlDist(v) {
   }
 }
 
+canvas.on('object:scaling', function (e) {
+  if (e.target.type == "image") {
+    document.getElementById("height").value = parseInt(Math.max(10, canvas.getActiveObject().scaleY * 800));
+  }
+});
+
 canvas.on("selection:created", function (e) {
   if (e.target != template) {
     e.target.bringToFront();
@@ -284,6 +306,12 @@ canvas.on("selection:created", function (e) {
   } else {
     e.target.sendToBack();
     canvas.sendToBack(e.target);
+  }
+
+  if (e.target.type == "image") {
+    document.getElementById("heightDiv").style.display = "block";
+
+    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 800));
   }
 
   if (e.target.ignore) return;
@@ -311,6 +339,7 @@ canvas.on("selection:created", function (e) {
   } else document.getElementById("pins").value = "";
 });
 
+
 canvas.on("selection:updated", function (e) {
   if (e.target != template) {
     e.target.bringToFront();
@@ -320,11 +349,20 @@ canvas.on("selection:updated", function (e) {
     canvas.sendToBack(e.target);
   }
 
+  if (e.target.type == "image") {
+    document.getElementById("heightDiv").style.display = "block";
+    document.getElementById("plDistDiv").style.display = "none";
+
+    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 800));
+    // document.getElementById("height").value = Math.max(10, canvas.getActiveObject().height);
+  }
+
   if (e.target.ignore) return;
 
   if (e.target.type == "group") {
     document.getElementById("pins").value = e.target.input;
     document.getElementById("plDistDiv").style.display = "block";
+    document.getElementById("heightDiv").style.display = "none";
     if (!e.target.plDist) {
       e.target.plDist = 0;
       document.getElementById("plDist").value = "0";
@@ -344,6 +382,11 @@ canvas.on("selection:updated", function (e) {
     }
     document.getElementById("align").checked = !!e.target.align;
   } else document.getElementById("pins").value = "";
+
+  // if (e.target.type == "icon") {
+  //   document.getElementById("plDistDiv").style.display = "block";
+  //   alert("aaaa");
+  // }
 });
 
 const wPerChar = 7;
@@ -439,20 +482,20 @@ class Selector {
       let line2 = new fabric.Line(
         [
           (this.leftRight ? -1 : 1) * this.g.plDist +
-            (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
-            (this.leftRight ? -1 : 1) * (pwm[i] ? 20 : 0) +
-            +10 +
-            -(this.leftRight * 2 - 1),
+          (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
+          (this.leftRight ? -1 : 1) * (pwm[i] ? 20 : 0) +
+          +10 +
+          -(this.leftRight * 2 - 1),
           //---
           -this.g.offsetXY + 10 + i * 20 + 6.7,
 
           //---
           (this.leftRight ? -1 : 1) * this.g.plDist +
-            (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
-            +10 +
-            -(this.leftRight * 2 - 1) +
-            (this.leftRight ? -1 : 1) *
-              (document.getElementById("align").checked ? 25 : widths[k + 1]),
+          (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
+          +10 +
+          -(this.leftRight * 2 - 1) +
+          (this.leftRight ? -1 : 1) *
+          (document.getElementById("align").checked ? 25 : widths[k + 1]),
           //---
           -this.g.offsetXY + 10 + i * 20 + 6.7,
         ],
@@ -470,16 +513,16 @@ class Selector {
       let line3 = new fabric.Line(
         [
           (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
-            +10 +
-            -(this.leftRight * 2 - 1),
+          +10 +
+          -(this.leftRight * 2 - 1),
           //---
           -this.g.offsetXY + 10 + i * 20 + 6.7,
 
           //---
           (this.leftRight ? -1 : 1) * this.g.plDist +
-            (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
-            +10 +
-            -(this.leftRight * 2 - 1),
+          (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
+          +10 +
+          -(this.leftRight * 2 - 1),
           //---
           -this.g.offsetXY + 10 + i * 20 + 6.7,
         ],
@@ -500,8 +543,8 @@ class Selector {
           +10 + i * 20 + 6.7,
 
           (this.leftRight ? -this.g.offsetXY : this.g.offsetXY) +
-            +10 +
-            -(this.leftRight * 2 - 1), //* (pwm[i] ? 20 : 0),
+          +10 +
+          -(this.leftRight * 2 - 1), //* (pwm[i] ? 20 : 0),
           -this.g.offsetXY + 10 + i * 20 + 6.7,
         ],
         {
@@ -540,12 +583,10 @@ class Selector {
           let w = preWidths[j] + 7;
           let ph = new fabric.Path(
             this.leftRight
-              ? `M 0 0 L 7 7 L ${w} 7 L ${w + 7} 0 L ${w} -7 L 7 -7 L 0 0 M ${
-                  w + 7
-                } 0 L ${w + 14} 0.2 z`
-              : `M 0 0 L -7 0.2 M 0 0 L 7 7 L ${w} 7 L ${
-                  w + 7
-                } 0 L ${w} -7 L 7 -7  z`,
+              ? `M 0 0 L 7 7 L ${w} 7 L ${w + 7} 0 L ${w} -7 L 7 -7 L 0 0 M ${w + 7
+              } 0 L ${w + 14} 0.2 z`
+              : `M 0 0 L -7 0.2 M 0 0 L 7 7 L ${w} 7 L ${w + 7
+              } 0 L ${w} -7 L 7 -7  z`,
             {
               stroke: "black",
               strokeWidth: 1,
@@ -916,25 +957,30 @@ const loadTemplateHandler = (i) => {
 
 const loadIconHandler = (i) => {
   const urls = [
-    "assets/information.svg",
-    "assets/warning.svg",
-    "assets/led_blue.svg",
-    "assets/led_green.svg",
-    "assets/led_orange.svg",
-    "assets/led_purple.svg",
-    "assets/led_red.svg",
-    "assets/led_white.svg",
-    "assets/select.svg",
+    "assets/information_purple.svg.png",
+    "assets/information_gold.svg.png",
+    "assets/information_green.svg.png",
+    "assets/information_black.svg.png",
+    "assets/warning.svg.png",
+    "assets/led_blue.svg.png",
+    "assets/led_green.svg.png",
+    "assets/led_orange.svg.png",
+    "assets/led_purple.svg.png",
+    "assets/led_red.svg.png",
+    "assets/led_rgb.svg.png",
+    "assets/led_white.svg.png",
+    "assets/select.svg.png",
     "assets/010-usb.png",
     "assets/043-low-battery.png",
     "assets/062-easyC-Front.png",
-    "assets/button.svg",
+    "assets/button.svg.png",
     "assets/063-OSH.png",
     "assets/Legend-Soldered-pinouts.jpg",
     "assets/mounting-hole.png",
   ];
 
   if (urls[i].endsWith(".svg")) {
+    // unused
     fabric.loadSVGFromURL(urls[i], function (objects, options) {
       var g = fabric.util.groupSVGElements(objects, options);
       g.snapAngle = 15;
@@ -978,6 +1024,7 @@ const loadTextHandler = (i) => {
     fixedWidth: 150,
     fontFamily: "GT-Pressura",
     fill: ["black", "#582C83", "#25BAA8", "#BCA876"][i],
+    snapAngle: 15,
   });
 
   canvas.add(t);

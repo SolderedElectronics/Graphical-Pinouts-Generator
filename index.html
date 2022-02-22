@@ -107,24 +107,28 @@
                     </a>
 
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(0)">Info</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(1)">Attention Box</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(0)">Info Purple</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(1)">Info Gold</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(2)">Info Green</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(3)">Info Black</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(4)">Attention Box</a>
 
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(2)">LED Blue</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(3)">LED Green</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(4)">LED Orange</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(5)">LED Purple</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(6)">LED Red</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(7)">LED White</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(5)">LED Blue</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(6)">LED Green</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(7)">LED Orange</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(8)">LED Purple</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(9)">LED Red</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(10)">LED RGB</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(11)">LED White</a>
 
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(8)">Hand Symbol</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(9)">USB</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(10)">Battery</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(11)">easyC</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(12)">Button</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(13)">Open Source Hardware</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(14)">Legend</a>
-                        <a class="dropdown-item" href="#" onclick="loadIconHandler(15)">Mounting hole</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(12)">Hand Symbol</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(13)">USB</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(14)">Battery</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(15)">easyC</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(16)">Button</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(17)">Open Source Hardware</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(18)">Legend</a>
+                        <a class="dropdown-item" href="#" onclick="loadIconHandler(19)">Mounting hole</a>
                     </div>
                 </div>
 
@@ -207,6 +211,13 @@
                 <div class="d-flex flex-row justify-content-around" style="align-items: center;">
                     <label name="offset">Offset pads in xy: </label>
                     <input type="number" value="0" name="offset" id="offsetXY" oninput="updateOffsetXY(this.value)">
+                </div>
+            </div>
+            <div id="heightDiv">
+                <hr>
+                <div class="d-flex flex-row justify-content-around" style="align-items: center;">
+                    <label name="offset">Height</label>
+                    <input type="number" value="0" name="offset" id="height" oninput="updateHeight(this.value)">
                 </div>
             </div>
             <hr>
