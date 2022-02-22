@@ -109,6 +109,13 @@ canvas.on("before:selection:cleared", function (e) {
       document.getElementById("height").value
     )));
   }
+  if (e.target.type == "textbox") {
+    document.getElementById("heightDiv").style.display = "none";
+
+    canvas.getActiveObject().scaleToHeight(1.45 * Math.max(10, parseInt(
+      document.getElementById("height").value
+    )));
+  }
 });
 
 canvas.on("text:editing:exited", function (e) {
@@ -297,6 +304,10 @@ canvas.on('object:scaling', function (e) {
   if (e.target.type == "image") {
     document.getElementById("height").value = parseInt(Math.max(10, canvas.getActiveObject().scaleY * 800));
   }
+
+  if (e.target.type == "textbox") {
+    document.getElementById("height").value = parseInt(Math.max(10, canvas.getActiveObject().scaleY * 75.06));
+  }
 });
 
 canvas.on("selection:created", function (e) {
@@ -312,6 +323,12 @@ canvas.on("selection:created", function (e) {
     document.getElementById("heightDiv").style.display = "block";
 
     document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 800));
+  }
+
+  if (e.target.type == "textbox") {
+    document.getElementById("heightDiv").style.display = "block";
+
+    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 75.06));
   }
 
   if (e.target.ignore) return;
@@ -354,6 +371,14 @@ canvas.on("selection:updated", function (e) {
     document.getElementById("plDistDiv").style.display = "none";
 
     document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 800));
+    // document.getElementById("height").value = Math.max(10, canvas.getActiveObject().height);
+  }
+
+  if (e.target.type == "textbox") {
+    document.getElementById("heightDiv").style.display = "block";
+    document.getElementById("plDistDiv").style.display = "none";
+
+    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 75.06));
     // document.getElementById("height").value = Math.max(10, canvas.getActiveObject().height);
   }
 
