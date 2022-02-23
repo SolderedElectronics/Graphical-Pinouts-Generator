@@ -112,7 +112,7 @@ canvas.on("before:selection:cleared", function (e) {
   if (e.target.type == "textbox") {
     document.getElementById("heightDiv").style.display = "none";
 
-    canvas.getActiveObject().scaleToHeight(1.45 * Math.max(10, parseInt(
+    canvas.getActiveObject().scaleToHeight(Math.max(10, parseInt(
       document.getElementById("height").value
     )));
   }
@@ -302,11 +302,11 @@ function updatePlDist(v) {
 
 canvas.on('object:scaling', function (e) {
   if (e.target.type == "image") {
-    document.getElementById("height").value = parseInt(Math.max(10, canvas.getActiveObject().scaleY * 800));
+    document.getElementById("height").value = parseInt(Math.max(10, canvas.getActiveObject().scaleY * canvas.getActiveObject().height));
   }
 
   if (e.target.type == "textbox") {
-    document.getElementById("height").value = parseInt(Math.max(10, canvas.getActiveObject().scaleY * 75.06));
+    document.getElementById("height").value = parseInt(Math.max(10, canvas.getActiveObject().scaleY * canvas.getActiveObject().height));
   }
 });
 
@@ -322,13 +322,13 @@ canvas.on("selection:created", function (e) {
   if (e.target.type == "image") {
     document.getElementById("heightDiv").style.display = "block";
 
-    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 800));
+    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * e.target.height));
   }
 
   if (e.target.type == "textbox") {
     document.getElementById("heightDiv").style.display = "block";
 
-    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 75.06));
+    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * e.target.height));
   }
 
   if (e.target.ignore) return;
@@ -370,7 +370,7 @@ canvas.on("selection:updated", function (e) {
     document.getElementById("heightDiv").style.display = "block";
     document.getElementById("plDistDiv").style.display = "none";
 
-    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 800));
+    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * e.target.height));
     // document.getElementById("height").value = Math.max(10, canvas.getActiveObject().height);
   }
 
@@ -378,7 +378,7 @@ canvas.on("selection:updated", function (e) {
     document.getElementById("heightDiv").style.display = "block";
     document.getElementById("plDistDiv").style.display = "none";
 
-    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * 75.06));
+    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * e.target.height));
     // document.getElementById("height").value = Math.max(10, canvas.getActiveObject().height);
   }
 
@@ -1001,6 +1001,7 @@ const loadIconHandler = (i) => {
     "assets/button.svg.png",
     "assets/063-OSH.png",
     "assets/Legend-Soldered-pinouts.jpg",
+    "assets/table.png",
     "assets/mounting-hole.png",
   ];
 
