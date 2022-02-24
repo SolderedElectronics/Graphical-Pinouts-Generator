@@ -280,7 +280,11 @@ canvas.on("mouse:down", function (options) {
 
 function updateHeight(v) {
   if (canvas.getActiveObject()) {
-    canvas.getActiveObject().scaleToHeight(parseInt(v));
+    // console.log(Math.max(10, parseInt(v)))
+    if (!v)
+      canvas.getActiveObject().scaleToHeight(1);
+    else
+      canvas.getActiveObject().scaleToHeight(Math.max(10, parseInt(v)));
     // refresh(canvas.getActiveObject());
     canvas.renderAll();
   }
