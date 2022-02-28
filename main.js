@@ -103,16 +103,22 @@ canvas.on("before:selection:cleared", function (e) {
   }
 
   if (e.target.type == "image") {
+    if (!isNumeric(document.getElementById("height").value))
+      return;
+
     document.getElementById("heightDiv").style.display = "none";
 
-    canvas.getActiveObject().scaleToHeight(Math.max(10, parseInt(
+    canvas.getActiveObject().scaleToHeight(Math.max(10, canvas.getZoom() * parseInt(
       document.getElementById("height").value
     )));
   }
   if (e.target.type == "textbox") {
+    if (!isNumeric(document.getElementById("height").value))
+      return;
+
     document.getElementById("heightDiv").style.display = "none";
 
-    canvas.getActiveObject().scaleToHeight(Math.max(10, parseInt(
+    canvas.getActiveObject().scaleToHeight(Math.max(10, canvas.getZoom() * parseInt(
       document.getElementById("height").value
     )));
   }
@@ -278,13 +284,20 @@ canvas.on("mouse:down", function (options) {
   }
 });
 
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function updateHeight(v) {
+  if (!isNumeric(v))
+    return;
+
   if (canvas.getActiveObject()) {
     // console.log(Math.max(10, parseInt(v)))
     if (!v)
       canvas.getActiveObject().scaleToHeight(1);
     else
-      canvas.getActiveObject().scaleToHeight(Math.max(10, parseInt(v)));
+      canvas.getActiveObject().scaleToHeight(Math.max(10, canvas.getZoom() * parseInt(v)));
     // refresh(canvas.getActiveObject());
     canvas.renderAll();
   }
@@ -374,7 +387,7 @@ canvas.on("selection:updated", function (e) {
     document.getElementById("heightDiv").style.display = "block";
     document.getElementById("plDistDiv").style.display = "none";
 
-    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * e.target.height));
+    document.getElementById("height").value = parseInt(Math.max(10, canvas.getZoom() * e.target.scaleY * e.target.height));
     // document.getElementById("height").value = Math.max(10, canvas.getActiveObject().height);
   }
 
@@ -382,7 +395,7 @@ canvas.on("selection:updated", function (e) {
     document.getElementById("heightDiv").style.display = "block";
     document.getElementById("plDistDiv").style.display = "none";
 
-    document.getElementById("height").value = parseInt(Math.max(10, e.target.scaleY * e.target.height));
+    document.getElementById("height").value = parseInt(Math.max(10, canvas.getZoom() * e.target.scaleY * e.target.height));
     // document.getElementById("height").value = Math.max(10, canvas.getActiveObject().height);
   }
 
